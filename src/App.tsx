@@ -37,6 +37,8 @@ function App() {
   function handleDragEnd(event: DragEndEvent) {
     const item = items.find((x) => x.id === event.active.id);
 
+    if (!item) return;
+
     // Drop to SpawnList
     if (event.over && event.over.id === 'spawndropper') {
       item!.pos.dropped = true
