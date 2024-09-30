@@ -1,7 +1,12 @@
-export type Element = {
-    id: number,
-    name: string,
-    emoji: string,
-    rect?: DOMRect
-}
+import { UniqueIdentifier } from "@dnd-kit/core"
 
+export type Item = {
+    id?: UniqueIdentifier
+    name: string
+    symbol: string
+    pos: {
+        dropped: boolean
+        x: number
+        y: number
+    }
+}
