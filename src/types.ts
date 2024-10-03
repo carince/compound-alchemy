@@ -1,11 +1,10 @@
-import { UniqueIdentifier } from "@dnd-kit/core"
-
 export type Item = {
-    id?: UniqueIdentifier
+    id?: string
+    key: number
     name: string
     symbol: string
-    pos: {
-        dropped: boolean
+    rect?: DOMRect
+    pos?: {
         x: number
         y: number
     }

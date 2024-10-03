@@ -1,25 +1,44 @@
-import React, { CSSProperties } from 'react';
-import { useDraggable } from '@dnd-kit/core';
+import React, { useRef } from 'react';
 import { Item } from '../types';
+import { useIsTouchDevice } from '../utils/touch';
 
-function Draggable(props: React.PropsWithChildren<{ item: Item }>) {
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
-        id: props.item.id!,
-    });
+function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
+    item: Item,
+    onDragStart: (e: React.MouseEvent | React.TouchEvent) => void,
+    onDragStop: (e: React.MouseEvent | React.TouchEvent) => void,
+}>) {
+    const ref = useRef<HTMLDivElement>(null)
 
-    const pos = props.item.pos
+    const onProps =
+        useIsTouchDevice()
+            ? { onTouchStart: (e: React.TouchEvent) => onDragStart(e), onTouchEnd: (e: React.TouchEvent) => onDragStop(e) }
+            : { onMouseDown: (e: React.MouseEvent) => onDragStart(e), onMouseUp: (e: React.MouseEvent) => onDragStop(e) };
 
-    const style: CSSProperties = {
-        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-        position: pos.dropped ? "relative" : "fixed",
-        left: pos.dropped ? undefined : `${pos.x}px`,
-        top: pos.dropped ? undefined : `${pos.y}px`
+    const pos = (): React.CSSProperties => {
+        if (!item.pos) return {};
+        if (!ref.current) return {
+            left: `${item.pos.x - 50}px`,
+            top: `${item.pos.y - 25}px`,
+            position: "absolute",
+        };
+
+        return {
+            left: `${item.pos.x - (ref.current.getBoundingClientRect().width / 2)}px`,
+            top: `${item.pos.y - (ref.current.getBoundingClientRect().height / 2)}px`,
+            position: "absolute",
+        }
     }
 
+
     return (
-        <div ref={setNodeRef} style={style} {...listeners} {...attributes} className="py-3 px-6 border-2 border-neutral-200 rounded-xl font-semibold backdrop-blur-xl select-none">
-            {`${props.item.symbol} ${props.item.name}`}
-        </div>
+        <div
+            ref={ref}
+            {...onProps}
+            className="py-3 px-6 border-2 border-neutral-200 rounded-xl font-semibold backdrop-blur-sm select-none whitespace-nowrap"
+            style={{ ...pos() }}
+        >
+            {`${item.symbol} ${item.name} `}
+        </div >
     );
 }
 
