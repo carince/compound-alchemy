@@ -34,10 +34,10 @@ function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
         <div
             ref={ref}
             {...onProps}
-            className="py-3 px-6 border-2 border-neutral-200 rounded-xl font-semibold backdrop-blur-sm select-none whitespace-nowrap"
+            className="p-2 md:py-3 md:px-5 inline-block text-xs md:text-xl text-center border-2 border-neutral-200 rounded-xl font-semibold backdrop-blur-sm select-none whitespace-nowrap"
             style={{ ...pos() }}
         >
-            {`${item.symbol} ${item.name} `}
+            <p className='text-blue-600 inline-block pr-2'>{item.symbol}</p>{item.name}
         </div >
     );
 }
