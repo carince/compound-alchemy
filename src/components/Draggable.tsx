@@ -41,11 +41,11 @@ function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
         <div
             ref={ref}
             {...onProps}
-            className={`p-2 md:py-3 md:px-5 flex flex-row items-center text-xs max-w-28 md:text-xl border-2 border-neutral-200 rounded-xl font-semibold backdrop-blur-sm select-none ${hover}`}
+            className={`p-3 md:p-3 flex flex-row items-center text-xs max-w-28 md:max-w-40 md:text-xl border-2 border-neutral-200 rounded-xl backdrop-blur-sm select-none ${hover}`}
             style={{ ...pos() }}
         >
-            <p className='text-blue-600 pr-2'>{item.symbol}</p>
-            <p className='break-words'>{item.name}</p>
+            <p className='font-extrabold text-blue-600 pr-2 md:pr-3'>{item.symbol}</p>
+            <p className='font-semibold break-words'>{item.name}</p>
         </div>
     );
 }
