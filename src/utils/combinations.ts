@@ -21,8 +21,8 @@ const combinations = [
 
 export function boxesIntersect(a: Item, b: Item): boolean {
     return (
-        Math.abs(a.pos!.x - b.pos!.x) < 80 + 80 &&
-        Math.abs(a.pos!.y - b.pos!.y) < 28 + 28
+        Math.abs(a.style!.x - b.style!.x) < 80 + 80 &&
+        Math.abs(a.style!.y - b.style!.y) < 28 + 28
     );
 }
 
@@ -36,9 +36,9 @@ export function findIntersections(elements: Item[], targetId: string): (string |
 
 export function averagePosition(elements: (Item | undefined)[]) {
     const averageX =
-        elements.reduce((acc, el) => acc + el!.pos!.x, 0) / elements.length;
+        elements.reduce((acc, el) => acc + el!.style!.x, 0) / elements.length;
     const averageY =
-        elements.reduce((acc, el) => acc + el!.pos!.y, 0) / elements.length;
+        elements.reduce((acc, el) => acc + el!.style!.y, 0) / elements.length;
     return { x: averageX, y: averageY };
 }
 

@@ -5,8 +5,9 @@ import Draggable from "./Draggable";
 import { disableScroll, enableScroll, useIsTouchDevice } from "../utils/touch";
 import { averagePosition, combineElements, findIntersections } from "../utils/combinations";
 
-function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElements: Item[] }>) {
+function SpawnList({ startingElements, sidebarRef }: React.PropsWithoutRef<{ startingElements: Item[], sidebarRef: React.RefObject<HTMLDivElement> }>) {
     const dragId = useRef(""); // Reference to track the currently dragged element's ID
+    const [unlockedElements, setUnlockedElements] = useState<Item[]>(startingElements); // State to manage the list of unlocked elements
     const [elements, setElements] = useState<Item[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // Check if the device supports touch events
 
@@ -19,10 +20,33 @@ function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElement
                 const dragElement = state.find((el) => el.id === dragId.current);
                 if (!dragElement) return state;
 
-                const updatedElement = { ...dragElement, pos: { x, y } };
+                const updatedElement = { ...dragElement, style: { x, y, hover: 0 } };
                 state = state
                     .filter((element) => element.id !== dragId.current)
                     .concat(updatedElement);
+
+                const intersections = findIntersections(state, dragId.current);
+                state = state.map((element) => {
+                    const targetElement = state.find((e) => e.id === dragId.current);
+
+                    const otherElements = intersections
+                        .map((id) => elements.find((e) => e.id === id))
+                        .filter((e): e is Item => e !== undefined);
+
+                    const compound = combineElements(targetElement!, otherElements);
+
+                    if (intersections.includes(element.id)) {
+                        if (compound !== null) {
+                            element.style!.hover = 1;
+                        } else {
+                            element.style!.hover = 2;
+                        }
+                    } else {
+                        element.style!.hover = 0;
+                    }
+                    return element;
+                });
+
                 return state;
             });
         };
@@ -53,7 +77,7 @@ function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElement
                 window.removeEventListener("mousemove", onMouse);
             }
         };
-    }, [dragId, isTouchCapable]);
+    }, [elements, dragId, isTouchCapable]);
 
     // Function to handle the start of a drag event
     function onDragStart(element: Item, e: React.MouseEvent | React.TouchEvent) {
@@ -72,13 +96,30 @@ function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElement
         const prevDragId = dragId.current;
         dragId.current = "";
 
+        // Get the element that was dragged
+        const targetElement = elements.find((e) => e.id === prevDragId);
+        if (!targetElement) return;
+
+        // Delete the element if it was dragged into the sidebar
+        const sidebarRect = sidebarRef.current?.getBoundingClientRect();
+        if (sidebarRect) {
+            const targetRect = targetElement.style;
+            if (
+                targetRect &&
+                targetRect.x >= sidebarRect.left &&
+                targetRect.x <= sidebarRect.right &&
+                targetRect.y >= sidebarRect.top &&
+                targetRect.y <= sidebarRect.bottom
+            ) {
+                setElements((state) => state.filter((e) => e.id !== prevDragId));
+            }
+        }
+
+        // Find the elements that intersect with the dragged element and return if none
         const intersectedIds = findIntersections(elements, prevDragId);
         if (intersectedIds.length === 0) return;
 
         setElements((state) => {
-            const targetElement = state.find((e) => e.id === prevDragId);
-            if (!targetElement) return state;
-
             const updatedElements = state.filter(
                 (e) => e.id !== prevDragId && !intersectedIds.includes(e.id)
             );
@@ -89,17 +130,31 @@ function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElement
 
             if (otherElements.length === 0) return state;
 
+            // Combine the dragged element with the intersected elements
             const compound = combineElements(targetElement, otherElements);
             if (!compound) return state;
 
+            setUnlockedElements((state) => {
+                if (!state.find((e) => e.key === compound.key)) {
+                    return state.concat(compound);
+                }
+                return state;
+            });
+
+            // Calculate the new position for the combined element
             const newPos = averagePosition([...otherElements, targetElement]);
             const newElement: Item = {
                 ...targetElement,
                 ...compound,
                 id: nanoid(5),
-                pos: newPos
+                style: {
+                    x: newPos.x,
+                    y: newPos.y,
+                    hover: 0
+                }
             };
 
+            // Return the updated elements list with the combined element
             return [...updatedElements, newElement];
         });
     }
@@ -111,9 +166,10 @@ function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElement
             const newElement = {
                 ...element,
                 id: newId,
-                pos: {
+                style: {
                     x: "pageX" in event ? event.pageX : event.touches[0].pageX,
                     y: "pageY" in event ? event.pageY : event.touches[0].pageY,
+                    hover: 0
                 },
             };
             dragId.current = newId;
@@ -126,7 +182,7 @@ function SpawnList({ startingElements }: React.PropsWithoutRef<{ startingElement
             <div className="flex flex-col p-5 gap-5 items-center md:border-2 border-neutral-700/20 rounded-lg h-full w-full">
                 {
                     // Render starting elements as draggable components
-                    startingElements.map((element, key) => (
+                    unlockedElements.map((element, key) => (
                         <Draggable
                             key={key}
                             item={element}

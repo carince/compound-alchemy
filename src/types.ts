@@ -4,7 +4,8 @@ export type Item = {
     name: string
     symbol: string
     rect?: DOMRect
-    pos?: {
+    style?: {
+        hover: number
         x: number
         y: number
     }
