@@ -22,6 +22,17 @@
       "vike-react",
       "vite-plugin-vercel/types"
     ],
+    "paths": {
+      "@components/*": [
+        "./src/components/*"
+      ],
+      "@utils/*": [
+        "./src/utils/*"
+      ],
+      "@types": [
+        "./src/types.ts"
+      ],
+    },
     "jsx": "preserve",
     "jsxImportSource": "react"
   },

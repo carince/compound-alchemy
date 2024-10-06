@@ -33,6 +33,7 @@ export default tseslint.config(
   },
   {
     rules: {
+      "react/prop-types": "0",
       "@typescript-eslint/no-unused-vars": [
         1,
         {
