@@ -7,6 +7,7 @@ import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 import { items, averagePosition, combineElements, findIntersections } from "@/utils/combinations";
 import Draggable from "@/components/Draggable";
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
+import { useRouter } from "next/navigation";
 
 export default withPageAuthRequired(function Page() {
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -16,6 +17,7 @@ export default withPageAuthRequired(function Page() {
     const [elements, setElements] = useState<Item[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // Check if the device supports touch events
     const { user } = useUser();
+    const router = useRouter();
 
     // Effect to handle drag movements
     useEffect(() => {
@@ -210,7 +212,7 @@ export default withPageAuthRequired(function Page() {
                     )
                 }
 
-
+                <button className="bg-primary text-white font-semibold rounded-lg p-2 w-full" onClick={() => router.push("/test")}>Proceed to Posttest</button>
 
                 <div className="SpawnerList h-full w-full rounded-2xl border-2 border-base-100 overflow-auto">
                     <div className="flex flex-col p-5 gap-5 justify-center items-center w-full">
@@ -228,7 +230,7 @@ export default withPageAuthRequired(function Page() {
                     </div>
                 </div>
 
-
+                <button className="bg-red-600 text-white font-semibold rounded-lg p-2 w-full" onClick={() => setElements([])}>Clear Area</button>
             </div>
 
             <div className='Playground flex-grow relative flex items-center justify-center w-full h-full p-2'>
