@@ -1,9 +1,12 @@
 "use client"
 
+import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
+import type { User } from "@/types";
 
 export default function Home() {
   const { user } = useUser();
+  const router = useRouter();
 
   return (
     <div className="h-screen w-screen flex flex-col gap-5 items-center justify-center bg-base-100">
@@ -15,12 +18,25 @@ export default function Home() {
         </div>
       </div>
       <button
-        onClick={() => {
-          console.log(user);
+        onClick={async () => {
+          console.log(`Auth0 user: ${user}`);
           if (user) {
-            window.location.href = '/game';
+            const data = await fetch('/api/user', {
+              method: 'POST',
+              body: JSON.stringify({ email: user.email }),
+            })
+
+            const userData: User = await data.json()
+            if (userData.progress.pretest.completed) {
+              if (userData.progress.posttest.completed) {
+                return router.push('/end')
+              }
+              return router.push('/game');
+            } else {
+              return router.push('/test');
+            }
           } else {
-            window.location.href = '/api/auth/login';
+            return router.push('/api/auth/login');
           }
         }}
         className="bg-blue-900 rounded-lg p-5 px-10 text-2xl font-bold text-white"

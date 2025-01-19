@@ -6,13 +6,13 @@ import { nanoid } from "nanoid";
 import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 import { items, averagePosition, combineElements, findIntersections } from "@/utils/combinations";
 import Draggable from "@/components/Draggable";
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 
-export default function Page() {
+export default withPageAuthRequired(function Page() {
     const sidebarRef = useRef<HTMLDivElement>(null);
 
     const dragId = useRef(""); // Reference to track the currently dragged element's ID
-    const [unlockedElements, setUnlockedElements] = useState<Item[]>(items.slice(0, 116)); // State to manage the list of unlocked elements
+    const [unlockedElements, setUnlockedElements] = useState<Item[]>(items.slice(0, 4)); // State to manage the list of unlocked elements
     const [elements, setElements] = useState<Item[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // Check if the device supports touch events
     const { user } = useUser();
@@ -256,4 +256,4 @@ export default function Page() {
             </div>
         </div >
     );
-}
+})
