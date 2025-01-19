@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useRef, useState, useEffect } from "react";
-import { Item } from "@/types";
+import { Item, User } from "@/types";
 import { nanoid } from "nanoid";
 import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 import { items, averagePosition, combineElements, findIntersections } from "@/utils/combinations";
@@ -86,6 +86,28 @@ export default withPageAuthRequired(function Page() {
             }
         };
     }, [elements, dragId, isTouchCapable]);
+
+    useEffect(() => {
+
+        async function checkUserData() {
+            if (user) {
+                const data = await fetch('/api/user', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: user.email }),
+                })
+
+                const userData: User = await data.json()
+                if (!userData.progress.pretest.completed) {
+                    return router.push('/test');
+                }
+            } else {
+                return router.push('/api/auth/login');
+            }
+        }
+
+        checkUserData()
+    }, [user, router]);
+
 
     // Set dragId reference and disable scrolling
     function onDragStart(element: Item, e: React.MouseEvent | React.TouchEvent) {
@@ -187,7 +209,7 @@ export default withPageAuthRequired(function Page() {
 
     return (
         <div className="absolute w-full h-full flex flex-row bg-base-100 text-white overflow-hidden">
-            <div ref={sidebarRef} className="Sidebar flex-shrink-0 w-52 md:w-72 h-full bg-base-200 flex flex-col p-2 md:p-5 gap-5 overflow-hidden">
+            <div ref={sidebarRef} className="Sidebar flex-shrink-0 h-full bg-base-200 flex flex-col p-2 md:p-5 gap-5 overflow-hidden">
                 <div>
                     <div className="flex justify-center items-center">
                         <img src="/logo.png" alt="Logo" className="w-16 h-16 inline-block md:mr-2" />
@@ -212,10 +234,10 @@ export default withPageAuthRequired(function Page() {
                     )
                 }
 
-                <button className="bg-primary text-white font-semibold rounded-lg p-2 w-full" onClick={() => router.push("/test")}>Proceed to Posttest</button>
+                <button className="bg-primary text-white text-sm md:text-lg font-semibold rounded-lg p-2 w-full" onClick={() => router.push("/test")}>Proceed to Posttest</button>
 
                 <div className="SpawnerList h-full w-full rounded-2xl border-2 border-base-100 overflow-auto">
-                    <div className="flex flex-col p-5 gap-5 justify-center items-center w-full">
+                    <div className="flex flex-col p-2 md:p-5 gap-5 justify-center items-center w-full">
                         {
                             // Render starting elements as draggable components but with no position
                             unlockedElements.map((element, key) => (
@@ -230,7 +252,7 @@ export default withPageAuthRequired(function Page() {
                     </div>
                 </div>
 
-                <button className="bg-red-600 text-white font-semibold rounded-lg p-2 w-full" onClick={() => setElements([])}>Clear Area</button>
+                <button className="bg-red-600 text-white text-sm md:text-lg font-semibold rounded-lg p-2 w-full" onClick={() => setElements([])}>Clear Area</button>
             </div>
 
             <div className='Playground flex-grow relative flex items-center justify-center w-full h-full p-2'>
