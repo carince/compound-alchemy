@@ -1,6 +1,6 @@
-import { Question } from "@/types";
+import { QuestionType } from "@/types";
 
-export const pretest: Question[] = [
+export const pretest: QuestionType[] = [
     {
         question: "What is the capital of France?",
         options: [
@@ -33,7 +33,7 @@ export const pretest: Question[] = [
     }
 ];
 
-export const posttest: Question[] = [
+export const posttest: QuestionType[] = [
     {
         question: "What is the capital of France?",
         options: [
