@@ -11,7 +11,7 @@ export type Item = {
     }
 }
 
-export type User = {
+export type UserType = {
     email: string
     progress: {
         pretest: {
@@ -37,7 +37,7 @@ export type Option = {
     label: string;
 };
 
-export type Question = {
+export type QuestionType = {
     question: string;
     options: Option[];
     answer: string;

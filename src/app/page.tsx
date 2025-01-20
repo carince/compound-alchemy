@@ -2,41 +2,50 @@
 
 import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import type { User } from "@/types";
+import { UserType } from "@/types";
+import Branding from "@/components/Branding";
+import { toast } from "sonner";
+
+import { fadeIn, fadeOut } from "@/utils/transitions";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user } = useUser();
   const router = useRouter();
 
+  useEffect(() => {
+    fadeIn();
+  }, []);
+
   return (
     <div className="h-screen w-screen flex flex-col gap-5 items-center justify-center bg-base-100">
-      <div className="flex flex-row">
-        <img src="/logo.png" alt="Logo" className="w-24 h-24 inline-block md:mr-2" />
-        <div className="flex flex-col">
-          <span className="text-4xl font-bold text-white">Compound</span>
-          <span className="text-4xl font-bold text-[#4b77d1]">Alchemy</span>
-        </div>
-      </div>
+      <Branding className="gap-5" />
+      <p className="text-md">Made with ❤️ by 12 - St. Agatha of Sicily</p>
       <button
         onClick={async () => {
-          console.log(`Auth0 user: ${user}`);
           if (user) {
-            const data = await fetch('/api/user', {
+            const request = await fetch('/api/user', {
               method: 'POST',
               body: JSON.stringify({ email: user.email }),
             })
 
-            const userData: User = await data.json()
+            if (!request.ok) return toast.error("Error occured fetching user data, please try again later");
+
+            const userData: UserType = await request.json()
+
             if (userData.progress.pretest.completed) {
               if (userData.progress.posttest.completed) {
-                return router.push('/end')
+                router.push('/end')
+                fadeOut();
               }
-              return router.push('/game');
+              router.push('/game');
+              fadeOut();
             } else {
-              return router.push('/test');
+              router.push('/test');
+              fadeOut();
             }
           } else {
-            return router.push('/api/auth/login');
+            router.push('/api/auth/login');
           }
         }}
         className="bg-blue-900 rounded-lg p-5 px-10 text-2xl font-bold text-white"

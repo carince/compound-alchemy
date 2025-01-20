@@ -1,13 +1,16 @@
 "use client"
 
 import React, { useRef, useState, useEffect } from "react";
-import { Item, User } from "@/types";
+import { Item, UserType } from "@/types";
 import { nanoid } from "nanoid";
 import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 import { items, averagePosition, combineElements, findIntersections } from "@/utils/combinations";
 import Draggable from "@/components/Draggable";
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
+import Branding from "@/components/Branding";
+import User from "@/components/User";
+import { fadeIn, fadeOut } from "@/utils/transitions";
 
 export default withPageAuthRequired(function Page() {
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -59,35 +62,31 @@ export default withPageAuthRequired(function Page() {
             });
         };
 
-        const onTouch = (e: TouchEvent) => {
+        const handleMove = (e: TouchEvent | MouseEvent) => {
             if (dragId.current === "") return;
             e.preventDefault();
-            const touch = e.targetTouches[0];
-            onMove({ x: touch.pageX, y: touch.pageY });
-        };
-
-        const onMouse = (e: MouseEvent) => {
-            if (dragId.current === "") return;
-            e.preventDefault();
-            onMove({ x: e.pageX, y: e.pageY });
+            const x = 'touches' in e ? e.touches[0].pageX : e.pageX;
+            const y = 'touches' in e ? e.touches[0].pageY : e.pageY;
+            onMove({ x, y });
         };
 
         if (isTouchCapable) {
-            window.addEventListener("touchmove", onTouch, { passive: false });
+            window.addEventListener("touchmove", handleMove, { passive: false });
         } else {
-            window.addEventListener("mousemove", onMouse);
+            window.addEventListener("mousemove", handleMove);
         }
 
         return () => {
             if (isTouchCapable) {
-                window.removeEventListener("touchmove", onTouch);
+                window.removeEventListener("touchmove", handleMove);
             } else {
-                window.removeEventListener("mousemove", onMouse);
+                window.removeEventListener("mousemove", handleMove);
             }
         };
     }, [elements, dragId, isTouchCapable]);
 
     useEffect(() => {
+        fadeIn();
 
         async function checkUserData() {
             if (user) {
@@ -96,17 +95,19 @@ export default withPageAuthRequired(function Page() {
                     body: JSON.stringify({ email: user.email }),
                 })
 
-                const userData: User = await data.json()
+                const userData: UserType = await data.json()
                 if (!userData.progress.pretest.completed) {
-                    return router.push('/test');
+                    router.push('/test');
+                    return fadeOut()
                 }
             } else {
-                return router.push('/api/auth/login');
+                router.push('/api/auth/login');
+                return fadeOut()
             }
         }
 
         checkUserData()
-    }, [user, router]);
+    });
 
 
     // Set dragId reference and disable scrolling
@@ -132,17 +133,13 @@ export default withPageAuthRequired(function Page() {
 
         // Delete the element if it was dragged into the sidebar
         const sidebarRect = sidebarRef.current?.getBoundingClientRect();
-        if (sidebarRect) {
-            const targetRect = targetElement.style;
-            if (
-                targetRect &&
-                targetRect.x >= sidebarRect.left &&
-                targetRect.x <= sidebarRect.right &&
-                targetRect.y >= sidebarRect.top &&
-                targetRect.y <= sidebarRect.bottom
-            ) {
-                setElements((state) => state.filter((e) => e.id !== prevDragId));
-            }
+        const targetRect = targetElement.style;
+
+        if (sidebarRect && targetRect &&
+            targetRect.x >= sidebarRect.left && targetRect.x <= sidebarRect.right &&
+            targetRect.y >= sidebarRect.top && targetRect.y <= sidebarRect.bottom) {
+            setElements((state) => state.filter((e) => e.id !== prevDragId));
+            return;
         }
 
         // Find the elements that intersect with the dragged element and return if none
@@ -210,31 +207,18 @@ export default withPageAuthRequired(function Page() {
     return (
         <div className="absolute w-full h-full flex flex-row bg-base-100 text-white overflow-hidden">
             <div ref={sidebarRef} className="Sidebar flex-shrink-0 h-full bg-base-200 flex flex-col p-2 md:p-5 gap-5 overflow-hidden">
-                <div>
-                    <div className="flex justify-center items-center">
-                        <img src="/logo.png" alt="Logo" className="w-16 h-16 inline-block md:mr-2" />
-                        <div className="hidden md:flex flex-col">
-                            <span className="text-md md:text-2xl leading-6 font-bold text-white">Compound</span>
-                            <span className="text-md md:text-2xl leading-6 font-bold text-[#4b77d1]">Alchemy</span>
-                        </div>
-                    </div>
-                </div>
+                <Branding className="flex justify-center sm:pt-3 md:pt-0" logoCn="w-14" textCn="hidden md:flex flex-col text-2xl " />
 
-                {
-                    user ? (
-                        <div className="flex flex-row justify-center items-center w-full px-3">
-                            <img src={user.picture!} alt={user.name!} className="aspect-square w-8 rounded-full" />
-                            <p className="pl-2 font-bold text-sm">{user.email!.replace("@ija.edu.ph", "")}</p>
-                            <a href="/api/auth/logout" className="aspect-square w-7 ml-auto"><img src="/logout.png" alt="" className="aspect-square w-10" /></a>
-                        </div>
-                    ) : (
-                        <div className="flex flex-row justify-center items-center w-full px-3 h-9">
-                            <p className="pl-2 font-bold text-xl">Loading...</p>
-                        </div>
-                    )
-                }
+                <User pictureCn="w-9" className="gap-2 md:gap-3" textCn="md:text-md text-sm" withLogout={true} />
 
-                <button className="bg-primary text-white text-sm md:text-lg font-semibold rounded-lg p-2 w-full" onClick={() => router.push("/test")}>Proceed to Posttest</button>
+                <button
+                    className="bg-primary text-white text-sm md:text-lg rounded-lg p-2 w-full"
+                    onClick={() => {
+                        router.push("/test")
+                        fadeOut()
+                    }}>
+                    Proceed to Posttest
+                </button>
 
                 <div className="SpawnerList h-full w-full rounded-2xl border-2 border-base-100 overflow-auto">
                     <div className="flex flex-col p-2 md:p-5 gap-5 justify-center items-center w-full">
@@ -252,7 +236,7 @@ export default withPageAuthRequired(function Page() {
                     </div>
                 </div>
 
-                <button className="bg-red-600 text-white text-sm md:text-lg font-semibold rounded-lg p-2 w-full" onClick={() => setElements([])}>Clear Area</button>
+                <button className="bg-red-600 text-white text-sm md:text-lg rounded-lg p-2 w-full" onClick={() => setElements([])}>Clear Area</button>
             </div>
 
             <div className='Playground flex-grow relative flex items-center justify-center w-full h-full p-2'>
@@ -271,7 +255,7 @@ export default withPageAuthRequired(function Page() {
                 </div>
                 <img
                     src="/drag-help.png" alt="Logo"
-                    className={`w-80 text-neutral-content text-center select-none ${elements.length !== 0 ? "hidden" : ""}`}>
+                    className={`w-3/4 max-w-96 select-none ${elements.length !== 0 ? "hidden" : ""}`}>
                 </img>
                 <div className="absolute md:hidden left-0 bottom-0 flex p-2 flex-col mt-auto select-none">
                     <span className="text-2xl leading-6 font-bold text-white/25">Compound</span>

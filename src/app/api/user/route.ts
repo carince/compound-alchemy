@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { dbConnect } from '@/utils/mongodb';
-import { User } from '@/types';
+import { UserType } from '@/types';
 
 export async function POST(req: NextRequest) {
     console.log("API request received!");
@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
 
             const user = await collection.findOne({ email: userEmail });
             if (!user) {
-                const newUser: User = {
+                const newUser: UserType = {
                     email: userEmail,
                     progress: {
                         pretest: {
