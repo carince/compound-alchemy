@@ -11,6 +11,7 @@ import { QuestionType, UserType } from '@/types';
 import User from '@/components/User';
 import Branding from '@/components/Branding';
 import { fadeIn, fadeOut } from '@/utils/transitions';
+import Spinner from '@/components/Spinner';
 
 
 export default withPageAuthRequired(function Home() {
@@ -102,7 +103,7 @@ export default withPageAuthRequired(function Home() {
     };
 
     return (
-        <div className="h-screen w-screen bg-base-100 flex flex-col items-center justify-center gap-10">
+        <div className="h-screen w-screen bg-base-100 flex flex-col items-center py-10 gap-10">
             {showPopup && (
                 <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-50 z-30">
                     <div className="bg-base-200 p-5 w-3/4 rounded shadow-lg text-center">
@@ -149,7 +150,14 @@ export default withPageAuthRequired(function Home() {
 
                 <button onClick={handleSubmit} className={`px-4 py-2 disabled:bg-zinc-600 bg-blue-500 text-white rounded`} disabled={submitting}>
                     {
-                        submitting ? "Submitting..." : "Submit"
+                        submitting ? (
+                            <div className='flex gap-3 items-center'>
+                                <Spinner size="w-8" strokeCn="stroke-white" />
+                                Submitting...
+                            </div>
+                        ) : (
+                            "Submit"
+                        )
                     }
                 </button>
             </div>

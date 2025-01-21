@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Compound Graph</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .link {
+            stroke: #aaa;
+            stroke-width: 2px;
+        }
+
+        .node text {
+            font-size: 12px;
+            text-anchor: middle;
+            fill: #333;
+        }
+
+        .tooltip {
+            position: absolute;
+            text-align: center;
+            background: #fff;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            pointer-events: none;
+            font-size: 12px;
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tooltip" class="tooltip"></div>
+    <script>
+        // Original variables
+        const items = [
+            { key: 0, name: "Hydrogen", symbol: "H" },
+            { key: 1, name: "Oxygen", symbol: "O" },
+            { key: 2, name: "Sodium", symbol: "Na" },
+            { key: 3, name: "Chlorine", symbol: "Cl" },
+            { key: 4, name: "Water", symbol: "H2O" }, // H + O
+            { key: 5, name: "Sodium Chloride", symbol: "NaCl" }, // Na + Cl
+            { key: 6, name: "Hydrogen Chloride", symbol: "HCl" }, // H + Cl
+            { key: 7, name: "Sodium Oxide", symbol: "Na2O" }, // Na + O
+            { key: 8, name: "Hydrogen Peroxide", symbol: "H2O2" }, // H + O2
+            { key: 9, name: "Sodium Hydroxide", symbol: "NaOH" }, // Na + H2O
+            { key: 10, name: "Chlorine Dioxide", symbol: "ClO2" }, // Cl + O2
+            { key: 11, name: "Methane", symbol: "CH4" }, // C + H
+            { key: 12, name: "Carbon", symbol: "C" },
+            { key: 13, name: "Carbon Dioxide", symbol: "CO2" }, // C + O2
+            { key: 14, name: "Ammonia", symbol: "NH3" }, // N + H
+            { key: 15, name: "Nitrogen", symbol: "N" },
+            { key: 16, name: "Nitrogen Dioxide", symbol: "NO2" } // N + O2
+        ];
+
+        const combinations = [
+            { elements: [0, 1], compound: 4 }, // H + O -> Water
+            { elements: [2, 3], compound: 5 }, // Na + Cl -> Sodium Chloride
+            { elements: [0, 3], compound: 6 }, // H + Cl -> Hydrogen Chloride
+            { elements: [2, 1], compound: 7 }, // Na + O -> Sodium Oxide
+            { elements: [0, 1], compound: 8 }, // H + O2 -> Hydrogen Peroxide
+            { elements: [2, 4], compound: 9 }, // Na + H2O -> Sodium Hydroxide
+            { elements: [3, 1], compound: 10 }, // Cl + O2 -> Chlorine Dioxide
+            { elements: [12, 0], compound: 11 }, // C + H -> Methane
+            { elements: [12, 1], compound: 13 }, // C + O2 -> Carbon Dioxide
+            { elements: [15, 0], compound: 14 }, // N + H -> Ammonia
+            { elements: [15, 1], compound: 16 } // N + O2 -> Nitrogen Dioxide
+        ];
+
+        // Convert data into nodes and links
+        const nodes = items.map(item => ({
+            id: item.key,
+            name: item.name,
+            symbol: item.symbol,
+            isCompound: item.key >= 4
+        }));
+
+        const links = combinations.flatMap(comb => [
+            { source: comb.elements[0], target: comb.compound },
+            { source: comb.elements[1], target: comb.compound }
+        ]);
+
+        // Create the SVG container
+        const width = window.innerWidth, height = window.innerHeight;
+        const svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Tooltip
+        const tooltip = d3.select("#tooltip");
+
+        // Force simulation
+        const simulation = d3.forceSimulation(nodes)
+            .force("link", d3.forceLink(links).id(d => d.id).distance(100))
+            .force("charge", d3.forceManyBody().strength(-300))
+            .force("center", d3.forceCenter(width / 2, height / 2));
+
+        // Draw links
+        const link = svg.append("g")
+            .attr("class", "links")
+            .selectAll("line")
+            .data(links)
+            .join("line")
+            .attr("class", "link");
+
+        // Draw nodes
+        const node = svg.append("g")
+            .attr("class", "nodes")
+            .selectAll("g")
+            .data(nodes)
+            .join("g")
+            .attr("class", "node")
+            .call(d3.drag()
+                .on("start", dragStarted)
+                .on("drag", dragged)
+                .on("end", dragEnded));
+
+        // Add circles to nodes
+        node.append("circle")
+            .attr("r", 10)
+            .attr("fill", d => d.isCompound ? "#ffcc00" : "#69b3a2")
+            .on("mouseover", (event, d) => {
+                tooltip.style("opacity", 1)
+                    .html(`${d.name} (${d.symbol})`)
+                    .style("left", (event.pageX + 10) + "px")
+                    .style("top", (event.pageY - 10) + "px");
+            })
+            .on("mouseout", () => tooltip.style("opacity", 0));
+
+        // Add labels to nodes
+        node.append("text")
+            .attr("dy", -15)
+            .text(d => d.symbol);
+
+        // Update simulation
+        simulation.on("tick", () => {
+            link
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y);
+
+            node
+                .attr("transform", d => `translate(${d.x},${d.y})`);
+        });
+
+        // Drag event functions
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+    </script>
+</body>
+
+</html>

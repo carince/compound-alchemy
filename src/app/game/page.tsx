@@ -16,7 +16,10 @@ export default withPageAuthRequired(function Page() {
     const sidebarRef = useRef<HTMLDivElement>(null);
 
     const dragId = useRef(""); // Reference to track the currently dragged element's ID
-    const [unlockedElements, setUnlockedElements] = useState<Item[]>(items.slice(0, 4)); // State to manage the list of unlocked elements
+    const [unlockedElements, setUnlockedElements] = useState<Item[]>(() => {
+        const saved = localStorage.getItem('unlockedElements');
+        return saved ? JSON.parse(saved) : items.slice(0, 4);
+    }); // State to manage the list of unlocked elements
     const [elements, setElements] = useState<Item[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // Check if the device supports touch events
     const { user } = useUser();
@@ -85,6 +88,7 @@ export default withPageAuthRequired(function Page() {
         };
     }, [elements, dragId, isTouchCapable]);
 
+    // Effect for fetching user data
     useEffect(() => {
         fadeIn();
 
@@ -108,7 +112,6 @@ export default withPageAuthRequired(function Page() {
 
         checkUserData()
     });
-
 
     // Set dragId reference and disable scrolling
     function onDragStart(element: Item, e: React.MouseEvent | React.TouchEvent) {
@@ -162,10 +165,9 @@ export default withPageAuthRequired(function Page() {
             if (!compound) return state;
 
             setUnlockedElements((state) => {
-                if (!state.find((e) => e.key === compound.key)) {
-                    return state.concat(compound);
-                }
-                return state;
+                const newState = state.find((e) => e.key === compound.key) ? state : state.concat(compound);
+                localStorage.setItem('unlockedElements', JSON.stringify(newState));
+                return newState;
             });
 
             // Calculate the new position for the combined element
