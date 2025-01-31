@@ -1,6 +1,7 @@
 import React, { useRef } from 'react';
 import { Item } from '@/types';
 import { useIsTouchDevice } from '@/utils/touch';
+import { motion, useMotionValue, useMotionValueEvent, useVelocity } from 'motion/react';
 
 function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
     item: Item,
@@ -37,12 +38,22 @@ function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
                 : ""
         : "";
 
+    const x = useMotionValue(0)
+    const xVelocity = useVelocity(x)
+
+    useMotionValueEvent(xVelocity, "change", latest => {
+        console.log("Velocity", latest)
+    })
+
     return (
-        <div
+        <motion.div
             ref={item.style ? ref : null}
-            className={`flex flex-row items-stretch text-xs md:text-[16px] leading-5 border-2 border-neutral-200 rounded-xl backdrop-blur-sm select-none w-36 md:w-48 ${hover}`}
-            style={{ ...pos() }}
+            className={`flex flex-row items-stretch text-xs md:text-[16px] leading-5 border-2 border-neutral-200 rounded-xl backdrop-blur-sm select-none w-36 md:w-48 transition-shadow ${hover}`}
+            style={{ ...pos(), x }}
             {...item.style ? { ...onProps } : {}}
+            initial={{ opacity: 0, scale: 1, }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
         >
             <p
                 ref={!item.style ? ref : null}
@@ -50,7 +61,8 @@ function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
                 {...!item.style ? { ...onProps } : {}}
             >{item.symbol}</p>
             <p className='font-semibold w-full break-words p-2'>{item.name}</p>
-        </div>
+        </motion.div>
+
     );
 }
 
