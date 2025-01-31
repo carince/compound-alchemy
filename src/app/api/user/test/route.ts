@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
                 }
             }
 
-            const result = await collection.updateOne({ email }, update);
+            const result = await collection.updateOne({ email }, update, { upsert: true });
             console.log("Result: ", result);
             return NextResponse.json(result, { status: 200 });
         } catch (err: unknown) {

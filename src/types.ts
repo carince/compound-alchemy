@@ -13,7 +13,7 @@ export type Item = {
 
 export type UserType = {
     email: string
-    progress: {
+    progress?: {
         pretest: {
             completed: boolean
             score: number

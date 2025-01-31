@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import Branding from "@/components/Branding";
 import User from "@/components/User";
 import { fadeIn, fadeOut } from "@/utils/transitions";
+import { toast } from "sonner";
 
 export default withPageAuthRequired(function Page() {
     const sidebarRef = useRef<HTMLDivElement>(null);
@@ -100,7 +101,7 @@ export default withPageAuthRequired(function Page() {
                 })
 
                 const userData: UserType = await data.json()
-                if (!userData.progress.pretest.completed) {
+                if (userData.progress?.pretest.completed) {
                     router.push('/test');
                     return fadeOut()
                 }
@@ -165,9 +166,14 @@ export default withPageAuthRequired(function Page() {
             if (!compound) return state;
 
             setUnlockedElements((state) => {
-                const newState = state.find((e) => e.key === compound.key) ? state : state.concat(compound);
-                localStorage.setItem('unlockedElements', JSON.stringify(newState));
-                return newState;
+                const newElement = state.find((e) => e.key === compound.key) 
+                
+                if (newElement) {
+                    state.concat(compound)
+                    saveUnlockedElements(state)
+                }
+
+                return state
             });
 
             // Calculate the new position for the combined element
@@ -182,6 +188,8 @@ export default withPageAuthRequired(function Page() {
                     hover: 0
                 }
             };
+
+            //
 
             // Return the updated elements list with the combined element
             return [...updatedElements, newElement];
@@ -204,6 +212,21 @@ export default withPageAuthRequired(function Page() {
             dragId.current = newId;
             return [...state, newElement];
         });
+    }
+
+    async function saveUnlockedElements(state: Item[]) {
+        localStorage.setItem('unlockedElements', JSON.stringify(state));
+        const request = await fetch('/api/user/test', {
+            method: 'POST',
+            body: JSON.stringify({
+                email: user?.email,
+                unlocked: state
+            })
+        })
+
+        if (!request.ok) {
+            return toast.error("An error occured while submitting your answers. Please try again later.")
+        }
     }
 
     return (

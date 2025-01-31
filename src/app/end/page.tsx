@@ -29,7 +29,7 @@ export default function Home() {
     }, [user]);
 
     return (
-        <div className="h-full w-full flex flex-col py-14 items-center bg-base-100">
+        <div className="h-full w-full flex flex-col items-center bg-base-100">
             <div className="h-screen flex flex-col justify-center   w-3/4 gap-5">
                 <p className="text-6xl font-bold self-center"> Thank You!</p>
                 <div className="text-xl text-left">

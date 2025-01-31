@@ -19,20 +19,7 @@ export async function POST(req: NextRequest) {
             const user = await collection.findOne({ email: userEmail });
             if (!user) {
                 const newUser: UserType = {
-                    email: userEmail,
-                    progress: {
-                        pretest: {
-                            completed: false,
-                            score: 0,
-                            answers: {}
-                        },
-                        posttest: {
-                            completed: false,
-                            score: 0,
-                            answers: {}
-                        },
-                        level: 0
-                    }
+                    email: userEmail
                 };
 
                 await collection.insertOne(newUser);
