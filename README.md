@@ -1,40 +1,29 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+<div align="center" style="font-size: 3rem;">
+  <img src="https://github.com/carince/compound-alchemy/blob/next-page/public/logo.png?raw=true" alt="Logo" style="width: 6rem; aspect-ratio: 1 / 1;" />
+  
+  <h1 style="border-bottom: none;">Compound Alchemy</h1>
+</div>
 
-## Getting Started
+Compound Alchemy is a web application designed for a school research project. It helps users create and manage their own chemical compounds, inspired by the Little Alchemy game. The application provides an intuitive interface for users to learn about ionic and covalent compound bonding.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Features ✨
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- ⚛️ Interactive compound creation inspired by Little Alchemy
+- 📚 Educational content on ionic and covalent bonding
+- 🔑 Credential authentication using Auth0
+- 💾 Saving user data using MongoDB
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Built With 🛠️
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+- [Next.js](https://nextjs.org) - The React Framework
+- [React](https://reactjs.org) - A JavaScript library for building user interfaces
+- [MongoDB](https://www.mongodb.com) - NoSQL database for storing user data
+- [Vercel](https://vercel.com) - Deployment platform for modern web projects
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+<div align="center">
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Made with ❤️ by 12 - St. Agatha of Sicily
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+</div>
