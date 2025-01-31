@@ -4,15 +4,12 @@ import { useUser } from "@auth0/nextjs-auth0/client";
 import { UserType } from "@/types";
 import { useEffect, useState } from "react";
 import Branding from "@/components/Branding";
-import { fadeIn } from "@/utils/transitions";
 
 export default function Home() {
     const { user } = useUser();
     const [userData, setUserData] = useState<UserType | null>(null);
 
     useEffect(() => {
-        fadeIn()
-
         async function getUserData() {
             if (user) {
                 const data = await fetch('/api/user', {

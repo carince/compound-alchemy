@@ -10,7 +10,6 @@ import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import { useRouter } from "next/navigation";
 import Branding from "@/components/Branding";
 import User from "@/components/User";
-import { fadeIn, fadeOut } from "@/utils/transitions";
 import { toast } from "sonner";
 
 export default withPageAuthRequired(function Page() {
@@ -91,8 +90,6 @@ export default withPageAuthRequired(function Page() {
 
     // Effect for fetching user data
     useEffect(() => {
-        fadeIn();
-
         async function checkUserData() {
             if (user) {
                 const data = await fetch('/api/user', {
@@ -106,8 +103,7 @@ export default withPageAuthRequired(function Page() {
                     // return fadeOut()
                 }
             } else {
-                router.push('/api/auth/login');
-                return fadeOut()
+                return router.push('/api/auth/login');
             }
         }
 
@@ -239,8 +235,7 @@ export default withPageAuthRequired(function Page() {
                 <button
                     className="bg-primary text-white text-sm md:text-lg rounded-lg p-2 w-full"
                     onClick={() => {
-                        router.push("/test")
-                        fadeOut()
+                        return router.push("/test")
                     }}>
                     Proceed to Posttest
                 </button>

@@ -10,7 +10,6 @@ import { QuestionType, UserType } from '@/types';
 
 import User from '@/components/User';
 import Branding from '@/components/Branding';
-import { fadeIn, fadeOut } from '@/utils/transitions';
 import Spinner from '@/components/Spinner';
 
 
@@ -24,8 +23,6 @@ export default withPageAuthRequired(function Home() {
     const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
-        fadeIn();
-
         async function getTest() {
             if (!user) return;
 
@@ -98,8 +95,6 @@ export default withPageAuthRequired(function Home() {
         } else {
             router.push('/end');
         }
-
-        fadeOut()
     };
 
     return (

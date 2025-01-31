@@ -4,8 +4,7 @@ import { UserType } from "@/types";
 import Branding from "@/components/Branding";
 import { toast } from "sonner";
 
-import { fadeIn, fadeOut } from "@/utils/transitions";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Spinner from "@/components/Spinner";
 
 
@@ -14,10 +13,6 @@ export default function Home() {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    fadeIn();
-  }, []);
 
   async function handleStart() {
     setLoading(true)
@@ -36,15 +31,10 @@ export default function Home() {
       const { progress }: UserType = await request.json()
 
       if (progress?.pretest.completed) {
-        if (progress.posttest.completed) {
-          router.push('/end')
-          fadeOut();
-        }
-        router.push('/game');
-        fadeOut();
+        if (progress.posttest.completed) return router.push('/end')
+        return router.push('/game');
       } else {
-        router.push('/test');
-        fadeOut();
+        return router.push('/test');
       }
     } else {
       router.push('/api/auth/login');
