@@ -260,7 +260,8 @@ export default withPageAuthRequired(function Page() {
             </div>
 
             <div className='Playground flex-grow relative flex items-center justify-center w-full h-full p-2'>
-                <div className="fixed z-10 top-0 left-0 w-full">
+                <div
+                    className="fixed z-10 top-0 left-0 w-full">
                     {
                         // Render dynamically added elements as draggable components
                         elements.map((element) => (
