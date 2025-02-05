@@ -1,21 +1,28 @@
 "use client"
 
-import React, { useRef, useState, useEffect } from "react";
-import { Item, UserType } from "@/types";
-import { nanoid } from "nanoid";
-import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
-import { items, averagePosition, combineElements, findIntersections } from "@/utils/combinations";
-import Draggable from "@/components/Draggable";
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
+import { nanoid } from "nanoid";
 import { useRouter } from "next/navigation";
-import Branding from "@/components/Branding";
-import User from "@/components/User";
+import React, { createRef, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+
+import Branding from "@/components/Branding";
+import Draggable from "@/components/Draggable";
+import Spawner from "@/components/Spawner";
+import User from "@/components/User";
+import { Item, UserType } from "@/types";
+import { averagePosition, combineElements, findIntersections, items } from "@/utils/combinations";
+import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 
 export default withPageAuthRequired(function Page() {
     const sidebarRef = useRef<HTMLDivElement>(null);
-
-    const dragId = useRef(""); // Reference to track the currently dragged element's ID
+    const [dragInfo, setDragInfo] = useState({
+        id: "",
+        x: 0,
+        y: 0,
+        top: 0,
+        left: 0
+    }); // Reference to track the currently dragged element's ID
     const [unlockedElements, setUnlockedElements] = useState<Item[]>(() => {
         const saved = localStorage.getItem('unlockedElements');
         return saved ? JSON.parse(saved) : items.slice(0, 4);
@@ -29,19 +36,27 @@ export default withPageAuthRequired(function Page() {
     useEffect(() => {
         const onMove = ({ x, y }: { x: number, y: number }) => {
             setElements((state) => {
-                if (dragId.current === null) return state;
+                if (dragInfo.id === null) return state;
 
-                const dragElement = state.find((el) => el.id === dragId.current);
+                const dragElement = state.find((el) => el.id === dragInfo.id);
                 if (!dragElement) return state;
 
-                const updatedElement = { ...dragElement, style: { x, y, hover: 0 } };
+                const updatedElement = {
+                    ...dragElement,
+                    style: {
+                        x: dragInfo.left - (dragInfo.x - x),
+                        y: dragInfo.top - (dragInfo.y - y),
+                        hover: 0
+                    }
+                };
+
                 state = state
-                    .filter((element) => element.id !== dragId.current)
+                    .filter((element) => element.id !== dragInfo.id)
                     .concat(updatedElement);
 
-                const intersections = findIntersections(state, dragId.current);
+                const intersections = findIntersections(state, dragInfo.id);
                 state = state.map((element) => {
-                    const targetElement = state.find((e) => e.id === dragId.current);
+                    const targetElement = state.find((e) => e.id === dragInfo.id);
 
                     const otherElements = intersections
                         .map((id) => elements.find((e) => e.id === id))
@@ -66,66 +81,61 @@ export default withPageAuthRequired(function Page() {
         };
 
         const handleMove = (e: TouchEvent | MouseEvent) => {
-            if (dragId.current === "") return;
+            if (dragInfo.id === "") return;
             e.preventDefault();
-            const x = 'touches' in e ? e.touches[0].pageX : e.pageX;
-            const y = 'touches' in e ? e.touches[0].pageY : e.pageY;
+            const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
+            const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
             onMove({ x, y });
         };
 
         if (isTouchCapable) {
             window.addEventListener("touchmove", handleMove, { passive: false });
+            window.addEventListener("touchend", onDragStop);
         } else {
             window.addEventListener("mousemove", handleMove);
+            window.addEventListener("mouseup", onDragStop);
         }
 
         return () => {
             if (isTouchCapable) {
                 window.removeEventListener("touchmove", handleMove);
+                window.removeEventListener("touchend", onDragStop);
             } else {
                 window.removeEventListener("mousemove", handleMove);
+                window.removeEventListener("mouseup", onDragStop);
             }
         };
-    }, [elements, dragId, isTouchCapable]);
-
-    // Effect for fetching user data
-    useEffect(() => {
-        async function checkUserData() {
-            if (user) {
-                const data = await fetch('/api/user', {
-                    method: 'POST',
-                    body: JSON.stringify({ email: user.email }),
-                })
-
-                const userData: UserType = await data.json()
-                if (userData.progress?.pretest.completed) {
-                    // router.push('/test');
-                    // return fadeOut()
-                }
-            } else {
-                return router.push('/api/auth/login');
-            }
-        }
-
-        checkUserData()
-    }, []);
+    }, [elements, dragInfo, isTouchCapable]);
 
     // Set dragId reference and disable scrolling
     function onDragStart(element: Item, e: React.MouseEvent | React.TouchEvent) {
-        e.preventDefault();
         if (!element.id) return;
         disableScroll();
-        dragId.current = element.id;
-    }
+        const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
+        const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
+
+        const { top, left } = element.ref!.current!.getBoundingClientRect();
+
+        setDragInfo((state) => {
+            return {
+                ...state,
+                id: element.id!,
+                x,
+                y,
+                top,
+                left
+            };
+        });
+    };
 
     // Remove dragId reference and enable scrolling
-    function onDragStop(e: React.MouseEvent | React.TouchEvent) {
+    function onDragStop(e: MouseEvent | TouchEvent) {
         e.preventDefault();
-        if (dragId.current === "") return;
+        if (dragInfo.id === "") return;
         enableScroll();
 
-        const prevDragId = dragId.current;
-        dragId.current = "";
+        const prevDragId = dragInfo.id;
+        setDragInfo((state) => { return { ...state, id: "" } });
 
         // Get the element that was dragged
         const targetElement = elements.find((e) => e.id === prevDragId);
@@ -177,6 +187,7 @@ export default withPageAuthRequired(function Page() {
             const newElement: Item = {
                 ...targetElement,
                 ...compound,
+                ref: createRef(),
                 id: nanoid(5),
                 style: {
                     x: newPos.x,
@@ -184,8 +195,6 @@ export default withPageAuthRequired(function Page() {
                     hover: 0
                 }
             };
-
-            //
 
             // Return the updated elements list with the combined element
             return [...updatedElements, newElement];
@@ -200,15 +209,38 @@ export default withPageAuthRequired(function Page() {
                 ...element,
                 id: newId,
                 style: {
-                    x: "pageX" in event ? event.pageX : event.touches[0].pageX,
-                    y: "pageY" in event ? event.pageY : event.touches[0].pageY,
+                    x: "clientX" in event ? event.clientX : event.touches[0].clientX,
+                    y: "clientY" in event ? event.clientY : event.touches[0].clientY,
                     hover: 0
                 },
+                ref: createRef<HTMLDivElement>()
             };
-            dragId.current = newId;
+            setDragInfo((state) => { return { ...state, id: newId } });
             return [...state, newElement];
         });
     }
+
+    // Effect for fetching user data
+    useEffect(() => {
+        async function checkUserData() {
+            if (user) {
+                const data = await fetch('/api/user', {
+                    method: 'POST',
+                    body: JSON.stringify({ email: user.email }),
+                })
+
+                const userData: UserType = await data.json()
+                if (userData.progress?.pretest.completed) {
+                    if (process.env.NODE_ENV === 'development') return
+                    router.push('/test');
+                }
+            } else {
+                return router.push('/api/auth/login');
+            }
+        }
+
+        checkUserData()
+    }, []);
 
     async function saveUnlockedElements(state: Item[]) {
         localStorage.setItem('unlockedElements', JSON.stringify(state));
@@ -230,14 +262,14 @@ export default withPageAuthRequired(function Page() {
             <div ref={sidebarRef} className="Sidebar flex-shrink-0 h-full bg-base-200 flex flex-col p-2 md:p-5 gap-5 overflow-hidden">
                 <Branding className="flex justify-center sm:pt-3 md:pt-0" logoCn="w-14" textCn="hidden md:flex flex-col text-2xl " />
 
-                <User pictureCn="w-9" className="gap-2 md:gap-3" textCn="md:text-md text-sm" withLogout={true} />
+                {/* <User pictureCn="w-9" className="gap-2 md:gap-3" textCn="md:text-md text-sm" withLogout={true} /> */}
 
                 <button
                     className="bg-primary text-white text-sm md:text-lg rounded-lg p-2 w-full"
                     onClick={() => {
                         return router.push("/test")
                     }}>
-                    Proceed to Posttest
+                    Posttest
                 </button>
 
                 <div className="SpawnerList h-full w-full rounded-2xl border-2 border-base-100 overflow-auto">
@@ -245,17 +277,17 @@ export default withPageAuthRequired(function Page() {
                         {
                             // Render starting elements as draggable components but with no position
                             unlockedElements.map((element, key) => (
-                                <Draggable
+                                <Spawner
                                     key={key}
                                     item={element}
                                     onDragStart={(e) => onSpawnerDragStart(element, e)}
-                                    onDragStop={onDragStop}
                                 />
                             ))
                         }
                     </div>
                 </div>
 
+                <button className="bg-zinc-600 text-white text-sm md:text-lg rounded-lg p-2 w-full" onClick={() => setElements([])}>Settings</button>
                 <button className="bg-red-600 text-white text-sm md:text-lg rounded-lg p-2 w-full" onClick={() => setElements([])}>Clear Area</button>
             </div>
 
@@ -269,7 +301,6 @@ export default withPageAuthRequired(function Page() {
                                 key={element.id}
                                 item={element}
                                 onDragStart={(e) => onDragStart(element, e)}
-                                onDragStop={onDragStop}
                             />
                         ))
                     }

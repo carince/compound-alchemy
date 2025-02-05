@@ -1,6 +1,7 @@
-import { dbConnect } from '@/utils/mongodb';
-import { UserType } from '@/types';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+import { UserType } from '@/types';
+import { dbConnect } from '@/utils/mongodb';
 
 export default async function handler(
     req: NextApiRequest,

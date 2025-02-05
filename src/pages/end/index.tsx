@@ -1,10 +1,12 @@
 "use client"
 
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { UserType } from "@/types";
-import { useEffect, useState } from "react";
-import Branding from "@/components/Branding";
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
+
+import Branding from "@/components/Branding";
+import { UserType } from "@/types";
+
 
 export default function Home() {
     const { user } = useUser();

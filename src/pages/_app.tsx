@@ -1,8 +1,7 @@
 import "@/styles/globals.css";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { AnimatePresence, motion } from "motion/react";
 import type { AppProps } from "next/app";
-import { motion, AnimatePresence } from "motion/react";
-
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import { useRouter } from "next/router";
 

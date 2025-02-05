@@ -1,16 +1,16 @@
 "use client"
 
-import { useState, useEffect, SyntheticEvent } from 'react';
-import { useRouter } from 'next/navigation';
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
+import { useRouter } from 'next/navigation';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { toast } from "sonner"
 
-import { posttest, pretest } from '@/utils/questions';
-import { QuestionType, UserType } from '@/types';
 
-import User from '@/components/User';
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
+import User from '@/components/User';
+import { QuestionType, UserType } from '@/types';
+import { posttest, pretest } from '@/utils/questions';
 
 
 export default withPageAuthRequired(function Home() {

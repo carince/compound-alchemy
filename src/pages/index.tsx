@@ -1,11 +1,11 @@
-import { useRouter } from "next/navigation";
 import { useUser } from "@auth0/nextjs-auth0/client";
-import { UserType } from "@/types";
-import Branding from "@/components/Branding";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import { useState } from "react";
+import Branding from "@/components/Branding";
 import Spinner from "@/components/Spinner";
+import { UserType } from "@/types";
 
 
 export default function Home() {
