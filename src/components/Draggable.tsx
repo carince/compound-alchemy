@@ -30,13 +30,18 @@ function Draggable({ item, onDragStart, onDragStop }: React.PropsWithoutRef<{
         }
     }
 
-    const hover = item.style?.hover
-        ? item.style.hover === 1
-            ? "shadow-blue-500/50 shadow-[0_0_50px_rgba(0,0,0,1)]"
-            : item.style.hover === 2
-                ? "shadow-red-500/50 shadow-[0_0_50px_rgba(0,0,0,1)]"
-                : ""
-        : "";
+    let hover = "";
+    switch (item.style?.hover) {
+        case 1:
+            hover = "shadow-blue-500/50 shadow-[0_0_50px_rgba(0,0,0,1)]";
+            break;
+        case 2:
+            hover = "shadow-red-500/50 shadow-[0_0_50px_rgba(0,0,0,1)]";
+            break;
+        default:
+            hover = "";
+            break;
+    }
 
     return (
         <motion.div
