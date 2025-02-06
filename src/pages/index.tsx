@@ -30,11 +30,13 @@ export default function Home() {
 
       const { progress }: UserType = await request.json()
 
+      if (process.env.NODE_ENV === 'development') return router.push('/game');
+
       if (progress?.pretest.completed) {
         if (progress.posttest.completed) return router.push('/end')
         return router.push('/game');
       } else {
-        return router.push('/test');
+        return router.push('/tests');
       }
     } else {
       router.push('/api/auth/login');

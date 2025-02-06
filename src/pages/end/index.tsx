@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 import Branding from "@/components/Branding";
 import { UserType } from "@/types";
 
-
 export default function Home() {
     const { user } = useUser();
     const [userData, setUserData] = useState<UserType | null>(null);

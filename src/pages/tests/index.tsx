@@ -75,7 +75,7 @@ export default withPageAuthRequired(function Home() {
             }
         });
 
-        const request = await fetch('/api/user/test', {
+        const request = await fetch('/api/user/tests', {
             method: 'POST',
             body: JSON.stringify({
                 email: user?.email,

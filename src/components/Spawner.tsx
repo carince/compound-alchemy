@@ -14,10 +14,10 @@ function Spawner({ item, onDragStart }: {
 
     return (
         <div
+            ref={item.ref}
             className="flex flex-col md:flex-row items-stretch text-xs md:text-[16px] leading-5 border-2 border-neutral-400 rounded-xl backdrop-blur-sm select-none w-28 md:w-48 transition-shadow"
         >
             <p
-                ref={item.ref}
                 className='font-extrabold flex justify-center items-center text-primary min-w-14 md:min-w-20 bg-blue-500/15 m-1 rounded-lg'
                 {...dragProps}
             >{item.symbol}</p>

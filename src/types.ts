@@ -5,7 +5,6 @@ export type Item = {
     key: number
     name: string
     symbol: string
-    rect?: DOMRect
     ref?: React.RefObject<HTMLDivElement | null>
     style?: {
         hover: number
