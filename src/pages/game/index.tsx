@@ -21,19 +21,16 @@ export default withPageAuthRequired(function GamePage() {
     // Effect for fetching user data
     useEffect(() => {
         async function checkUserData() {
-            if (user) {
-                const data = await fetch('/api/user', {
-                    method: 'POST',
-                    body: JSON.stringify({ email: user.email }),
-                })
+            if (!user) return router.push('/api/auth/login');
+            const data = await fetch('/api/user', {
+                method: 'POST',
+                body: JSON.stringify({ email: user.email }),
+            })
 
-                const userData: UserType = await data.json()
-                if (userData.progress?.pretest.completed) {
-                    if (process.env.NODE_ENV === 'development') return
-                    router.push('/tests');
-                }
-            } else {
-                return router.push('/api/auth/login');
+            const { progress }: UserType = await data.json()
+            if (progress && !progress?.pretest) {
+                if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return
+                router.push('/tests');
             }
         }
 

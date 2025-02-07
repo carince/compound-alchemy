@@ -17,30 +17,25 @@ export default function Home() {
   async function handleStart() {
     setLoading(true)
 
-    if (user) {
-      const request = await fetch('/api/user', {
-        method: 'POST',
-        body: JSON.stringify({ email: user.email }),
-      })
+    if (!user) return router.push('/api/auth/login');
+    const request = await fetch('/api/user', {
+      method: 'POST',
+      body: JSON.stringify({ email: user.email }),
+    })
 
-      if (!request.ok) {
-        setLoading(false);
-        return toast.error("Error occured fetching user data, please try again later");
-      }
-
-      const { progress }: UserType = await request.json()
-
-      if (process.env.NODE_ENV === 'development') return router.push('/game');
-
-      if (progress?.pretest.completed) {
-        if (progress.posttest.completed) return router.push('/end')
-        return router.push('/game');
-      } else {
-        return router.push('/tests');
-      }
-    } else {
-      router.push('/api/auth/login');
+    if (!request.ok) {
+      setLoading(false);
+      return toast.error("Error occured fetching user data, please try again later");
     }
+
+    const { progress }: UserType = await request.json()
+
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
+
+    if (!progress) return router.push('/tests');
+    if (progress.posttest) return router.push('/end');
+
+    router.push('/game');
   }
 
   return (

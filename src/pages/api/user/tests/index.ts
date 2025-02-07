@@ -24,13 +24,12 @@ export default async function handler(
 
             const testType = test ? "posttest" : "pretest";
 
-            if (user.progress[testType].completed)
+            if (user.progress && user.progress[testType])
                 return res.status(200).json({ message: "Test already completed!" });
 
             const update = {
                 $set: {
-                    [`progress.${test ? "posttest" : "pretest"}`]: {
-                        completed: true,
+                    [`progress.${testType}`]: {
                         score,
                         answers
                     }
@@ -41,6 +40,7 @@ export default async function handler(
             return res.status(200).json(result);
         } catch (err: unknown) {
             res.status(500).json({ message: "Something went wrong!" });
+            console.log(err)
             throw new Error(`${err}`)
         }
     } else {

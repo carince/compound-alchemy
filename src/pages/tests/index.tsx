@@ -12,7 +12,6 @@ import User from '@/components/User';
 import { QuestionType, UserType } from '@/types';
 import { posttest, pretest } from '@/utils/questions';
 
-
 export default withPageAuthRequired(function Home() {
     const { user } = useUser();
     const router = useRouter();
@@ -33,23 +32,23 @@ export default withPageAuthRequired(function Home() {
 
             const userData: UserType = await data.json();
 
-            if (userData?.progress?.pretest.completed) {
-                if (userData.progress.posttest.completed) {
-                    // router.push('/end');
-                    setTest(1);
-                    setQuestions(posttest);
-                } else {
-                    setTest(1);
-                    setQuestions(posttest);
-                }
-            } else {
+            if (!userData?.progress?.pretest) {
                 setTest(0);
                 setQuestions(pretest);
+                return
             }
+
+            if (!userData.progress.posttest) {
+                setTest(1);
+                setQuestions(posttest);
+                return
+            }
+
+            return router.push('/end');
         }
 
         getTest();
-    });
+    }, []);
 
     const handleAnswerChange = (questionIndex: number, optionValue: string) => {
         setAnswers({

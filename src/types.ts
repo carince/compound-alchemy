@@ -16,14 +16,14 @@ export type Item = {
 export type UserType = {
     email: string
     progress?: {
-        pretest: {
+        pretest?: {
             completed: boolean
             score: number
             answers: {
                 [key: string]: number
             }
         }
-        posttest: {
+        posttest?: {
             completed: boolean
             score: number
             answers: {

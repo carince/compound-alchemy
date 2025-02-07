@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import type { AppProps } from "next/app";
 import { DM_Sans, Geist_Mono } from "next/font/google";
 import { useRouter } from "next/router";
+import { Toaster } from 'sonner';
 
 const geistSans = DM_Sans({
   weight: "300",
@@ -30,6 +31,7 @@ export default function App({ Component, pageProps }: AppProps) {
         >
           <main className={`antialiased ${geistSans.className} ${geistMono.className}`}>
             <Component {...pageProps} />
+            <Toaster richColors={true} theme="dark" />
           </main>
         </motion.div>
       </AnimatePresence>
