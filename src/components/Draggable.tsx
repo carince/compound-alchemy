@@ -40,16 +40,17 @@ function Draggable({ item, onDragStart }: {
             className={`flex flex-row items-stretch text-xs md:text-[16px] leading-5 border-2 border-neutral-400 rounded-xl backdrop-blur-sm select-none w-36 md:w-48 transition-shadow ${hover}`}
             style={{ ...pos() }}
             ref={item.ref}
+            key={item.id}
             {...dragProps}
-            initial={{ opacity: 0, scale: 1, }}
+            initial={{ opacity: 0, scale: 0, }}
             animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0 }}
         >
             <p
                 className='font-extrabold flex justify-center items-center text-primary min-w-14 md:min-w-20 bg-blue-500/15 m-1 rounded-lg'
             >{item.symbol}</p>
             <p className='font-semibold w-full break-words p-2'>{item.name}</p>
         </motion.div>
-
     );
 }
 

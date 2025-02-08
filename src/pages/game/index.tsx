@@ -1,6 +1,7 @@
 "use client"
 
 import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
+import { AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef } from "react";
 
@@ -74,16 +75,18 @@ export default withPageAuthRequired(function GamePage() {
             <div className='Playground flex-grow relative flex items-center justify-center w-full h-full p-2'>
                 <div
                     className="fixed z-10 top-0 left-0 w-full">
-                    {
-                        // Render dynamically added elements as draggable components
-                        elements.map((element) => (
-                            <Draggable
-                                key={element.id}
-                                item={element}
-                                onDragStart={(e) => onDragStart(element, e)}
-                            />
-                        ))
-                    }
+                    <AnimatePresence>
+                        {
+                            // Render dynamically added elements as draggable components
+                            elements.map((element, key) => (
+                                <Draggable
+                                    key={key}
+                                    item={element}
+                                    onDragStart={(e) => onDragStart(element, e)}
+                                />
+                            ))
+                        }
+                    </AnimatePresence>
                 </div>
                 <picture
                     className={`md:w-3/4 flex justify-center select-none ${elements.length !== 0 ? "hidden" : ""}`}

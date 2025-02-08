@@ -29,11 +29,9 @@ export default function Home() {
 
     const defaultAnimation = {
         hidden: {
-            x: "-15px",
             opacity: 0,
         },
         visible: {
-            x: "0px",
             opacity: 1,
         },
     };
