@@ -1,20 +1,17 @@
 "use client"
 
-import { useState, useEffect, SyntheticEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { toast } from "sonner"
 
-import { posttest, pretest } from '@/utils/questions';
-import { QuestionType, UserType } from '@/types';
 
-import User from '@/components/User';
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
+import User from '@/components/User';
+import { QuestionType, UserDataType } from '@/types';
+import { posttest, pretest } from '@/utils/questions';
 
-
-export default withPageAuthRequired(function Home() {
-    const { user } = useUser();
+export default function Home() {
     const router = useRouter();
     const [showPopup, setShowPopup] = useState(true);
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
@@ -22,34 +19,42 @@ export default withPageAuthRequired(function Home() {
     const [questions, setQuestions] = useState<null | QuestionType[]>(null);
     const [submitting, setSubmitting] = useState(false);
 
-    useEffect(() => {
-        async function getTest() {
-            if (!user) return;
-
-            const data = await fetch('/api/user', {
-                method: 'POST',
-                body: JSON.stringify({ email: user.email }),
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/user/', {
+                method: 'GET',
+                credentials: 'include',
             });
 
-            const userData: UserType = await data.json();
+            if (!res.ok) return toast.error("An error occured while fetching your data, please reload the website and try again.");
 
-            if (userData?.progress?.pretest.completed) {
-                if (userData.progress.posttest.completed) {
-                    // router.push('/end');
-                    setTest(1);
-                    setQuestions(posttest);
-                } else {
-                    setTest(1);
-                    setQuestions(posttest);
-                }
-            } else {
+            const data: UserDataType = await res.json();
+
+            if (!data?.progress?.pretest) {
                 setTest(0);
                 setQuestions(pretest);
+                return
             }
-        }
 
-        getTest();
-    });
+            if (!data.progress.posttest) {
+                setTest(1);
+                setQuestions(posttest);
+                return
+            }
+
+            return router.push('/end');
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            await fetchData();
+        };
+        fetchUser();
+    }, []);
 
     const handleAnswerChange = (questionIndex: number, optionValue: string) => {
         setAnswers({
@@ -75,10 +80,10 @@ export default withPageAuthRequired(function Home() {
             }
         });
 
-        const request = await fetch('/api/user/test', {
+        const request = await fetch('/api/user/tests', {
             method: 'POST',
+            credentials: 'include',
             body: JSON.stringify({
-                email: user?.email,
                 test,
                 score,
                 answers
@@ -158,4 +163,4 @@ export default withPageAuthRequired(function Home() {
             </div>
         </div>
     );
-})
+}

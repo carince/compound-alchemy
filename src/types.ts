@@ -1,9 +1,11 @@
+import React from "react"
+
 export type Item = {
     id?: string
     key: number
     name: string
     symbol: string
-    rect?: DOMRect
+    ref?: React.RefObject<HTMLDivElement | null>
     style?: {
         hover: number
         x: number
@@ -11,25 +13,34 @@ export type Item = {
     }
 }
 
-export type UserType = {
-    email: string
+export type UserAuthType = {
+    email: string,
+    password: string
+}
+
+export type UserDataType = {
+    userId: string
     progress?: {
-        pretest: {
-            completed: boolean
+        pretest?: {
             score: number
             answers: {
                 [key: string]: number
             }
         }
-        posttest: {
-            completed: boolean
+        posttest?: {
             score: number
             answers: {
                 [key: string]: number
             }
         }
-        level: number
+        elements?: {
+            unlocked: number[]
+        }
     }
+}
+
+export type SessionType = {
+    userId: string
 }
 
 export type Option = {

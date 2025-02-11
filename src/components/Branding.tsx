@@ -1,5 +1,5 @@
-import { twMerge } from "tailwind-merge";
 import Image from "next/image";
+import { twMerge } from "tailwind-merge";
 
 export default function Branding({ className, logoCn, textCn }: { className?: string, logoCn?: string, textCn?: string }) {
     return (

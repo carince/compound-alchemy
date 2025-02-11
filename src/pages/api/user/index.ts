@@ -1,32 +1,36 @@
-import { dbConnect } from '@/utils/mongodb';
-import { UserType } from '@/types';
 import { NextApiRequest, NextApiResponse } from 'next';
+
+import { Data } from '@/models/data';
+import dbConnect from '@/utils/db';
+import { verifyToken } from '@/utils/jwt';
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse) {
-    if (req.method === "POST") {
-        const client = await dbConnect();
+    res: NextApiResponse
+) {
+    if (req.method === "GET") {
+        await dbConnect();
 
         try {
-            const collection = client.collection("users");
-
-            const userEmail = JSON.parse(req.body).email;
-            if (typeof userEmail !== 'string') {
-                return res.json({ message: "Invalid email parameter!" });
+            // Extract token from Authorization header
+            const token = req.cookies.token
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized" });
             }
 
-            const user = await collection.findOne({ email: userEmail });
-            if (!user) {
-                const newUser: UserType = {
-                    email: userEmail
-                };
-
-                await collection.insertOne(newUser);
-                return res.status(200).json(newUser);
+            // Verify token
+            const decoded = await verifyToken(token);
+            if (!decoded) {
+                return res.status(401).json({ message: "Unauthorized" });
             }
 
-            return res.status(200).json(user);
+            // Check if user already has associated data
+            const userData = await Data.findOne({ userId: decoded.userId });
+            if (!userData) {
+                return res.status(404).json({ message: "User not found" });
+            }
+
+            return res.status(200).json(userData);
         } catch {
             return res.status(500).json({ message: "Something went wrong!" });
         }

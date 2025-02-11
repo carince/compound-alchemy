@@ -1,44 +1,35 @@
-import { useRouter } from "next/navigation";
-import { useUser } from "@auth0/nextjs-auth0/client";
-import { UserType } from "@/types";
-import Branding from "@/components/Branding";
-import { toast } from "sonner";
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
-import { useState } from "react";
-import Spinner from "@/components/Spinner";
-
+import Branding from '@/components/Branding';
+import Spinner from '@/components/Spinner';
+import { UserDataType } from '@/types';
 
 export default function Home() {
-  const { user } = useUser();
   const router = useRouter();
-
   const [loading, setLoading] = useState(false);
 
   async function handleStart() {
-    setLoading(true)
+    setLoading(true);
 
-    if (user) {
-      const request = await fetch('/api/user', {
-        method: 'POST',
-        body: JSON.stringify({ email: user.email }),
-      })
+    const request = await fetch('/api/user', {
+      credentials: 'include',
+    });
 
-      if (!request.ok) {
-        setLoading(false);
-        return toast.error("Error occured fetching user data, please try again later");
-      }
-
-      const { progress }: UserType = await request.json()
-
-      if (progress?.pretest.completed) {
-        if (progress.posttest.completed) return router.push('/end')
-        return router.push('/game');
-      } else {
-        return router.push('/test');
-      }
-    } else {
-      router.push('/api/auth/login');
+    if (!request.ok) {
+      return router.push('/login');
     }
+
+    const { progress }: UserDataType = await request.json();
+
+    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
+
+    console.log(progress)
+
+    if (!progress?.pretest) return router.push('/tests');
+    if (progress?.posttest) return router.push('/end');
+
+    router.push('/game');
   }
 
   return (
