@@ -13,25 +13,34 @@ export type Item = {
     }
 }
 
-export type UserType = {
-    email: string
+export type UserAuthType = {
+    email: string,
+    password: string
+}
+
+export type UserDataType = {
+    userId: string
     progress?: {
         pretest?: {
-            completed: boolean
             score: number
             answers: {
                 [key: string]: number
             }
         }
         posttest?: {
-            completed: boolean
             score: number
             answers: {
                 [key: string]: number
             }
         }
-        level: number
+        elements?: {
+            unlocked: number[]
+        }
     }
+}
+
+export type SessionType = {
+    userId: string
 }
 
 export type Option = {

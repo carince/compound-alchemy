@@ -1,15 +1,12 @@
-import { UserProfile } from "@auth0/nextjs-auth0/client";
 import { nanoid } from "nanoid";
 import React, { createRef, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Item } from "@/types";
+import { Item, UserDataType } from "@/types";
 import { averagePosition, combineElements, findIntersections, items } from "@/utils/combinations";
 import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 
-import { Logger } from "./logger";
-
-export const useDrag = ({ sidebarRef, user }: { sidebarRef: React.RefObject<HTMLElement | null>, user?: UserProfile }) => {
+export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElement | null> }) => {
     const [dragInfo, setDragInfo] = useState({
         id: "",
         x: 0,
@@ -17,14 +14,53 @@ export const useDrag = ({ sidebarRef, user }: { sidebarRef: React.RefObject<HTML
         top: 0,
         left: 0
     });
-    const [unlockedElements, setUnlockedElements] = useState<Item[]>(() => {
-        const saved = localStorage.getItem('unlockedElements');
-        return saved ?
-            (JSON.parse(saved) as Item[]).map(item => { return { ...item, ref: createRef<HTMLDivElement>() } }) :
-            items.slice(0, 4).map(item => { return { ...item, ref: createRef<HTMLDivElement>() } });
-    });
+    const [unlockedElements, setUnlockedElements] = useState<Item[]>([]);
     const [elements, setElements] = useState<Item[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // 
+
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/user/', {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!res.ok) return toast.error("An error occured while fetching your data, please reload the website and try again.");
+
+            const data = await res.json() as UserDataType;
+
+            const unlocked = data.progress?.elements?.unlocked;
+
+            if (!unlocked || unlocked.length < 4) {
+                setUnlockedElements((state) => {
+                    const x = items
+                        .slice(0, 4)
+                        .map(item => { return { ...item, ref: createRef<HTMLDivElement>() } })
+
+                    return [...state, ...x]
+                });
+            }
+
+            setUnlockedElements((state) => {
+                const x = items.filter(
+                    (item) => unlocked?.includes(item.key))
+                    .map(item => { return { ...item, ref: createRef<HTMLDivElement>() } })
+
+                return [...state, ...x]
+            });
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            await fetchData();
+        };
+        fetchUser();
+    }, []);
+
 
     // Effect to handle drag movements
     useEffect(() => {
@@ -126,7 +162,6 @@ export const useDrag = ({ sidebarRef, user }: { sidebarRef: React.RefObject<HTML
     function onDragStop(e: MouseEvent | TouchEvent) {
         e.preventDefault();
         if (dragInfo.id === "") return;
-        Logger.log("dragStop", "dragging stopped");
         enableScroll();
 
         const prevDragId = dragInfo.id;
@@ -171,7 +206,7 @@ export const useDrag = ({ sidebarRef, user }: { sidebarRef: React.RefObject<HTML
 
                 if (notUnlocked) {
                     state.push(compound)
-                    saveUnlockedElements(state.map(item => { return { ...item, ref: undefined } }))
+                    saveUnlockedElements(state)
                 }
 
                 return state
@@ -233,14 +268,11 @@ export const useDrag = ({ sidebarRef, user }: { sidebarRef: React.RefObject<HTML
     }
 
     async function saveUnlockedElements(state: Item[]) {
-        if (!user) return
-
-        localStorage.setItem('unlockedElements', JSON.stringify(state));
         const request = await fetch('/api/user/elements', {
             method: 'POST',
+            credentials: 'include',
             body: JSON.stringify({
-                email: user?.email,
-                unlocked: state
+                unlocked: state.map(item => item.key)
             })
         })
 

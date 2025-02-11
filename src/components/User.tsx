@@ -1,8 +1,42 @@
-import { useUser } from "@auth0/nextjs-auth0/client";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 
 export default function User({ withLogout, className, pictureCn, textCn }: { withLogout?: boolean, className?: string, pictureCn?: string, textCn?: string }) {
-    const { user, error, isLoading } = useUser();
+    const [user, setUser] = useState<{ email: string } | null>(null);
+    const [error, setError] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+
+    const fetchData = async () => {
+        try {
+            const res = await fetch('/api/auth/me', {
+                method: 'GET',
+                credentials: 'include',
+            });
+
+            if (!res.ok) {
+                setIsLoading(false)
+                setError(true)
+                return toast.error("An error occured while fetching your data, please reload the website and try again.")
+            };
+
+            const { user } = await res.json() as { user: { email: string } };
+
+            setIsLoading(false)
+            setUser(user);
+        } catch (error) {
+            console.error(error);
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            await fetchData();
+        };
+
+        fetchUser();
+    }, []);
 
     if (error) return (
         <div className={twMerge("flex items-center justify-between ", className)} >
@@ -22,7 +56,6 @@ export default function User({ withLogout, className, pictureCn, textCn }: { wit
         user && (
             <div className="flex items-center justify-between">
                 <div className={twMerge("flex gap-2 items-center justify-between ", className)}>
-                    <img src={user.picture!} alt={user.name!} className={twMerge("aspect-square rounded-full", pictureCn)} />
                     <p className={twMerge("capitalize font-semibold", textCn)}>{name}</p>
                 </div>
                 {

@@ -1,31 +1,31 @@
 "use client"
 
-import { useUser } from "@auth0/nextjs-auth0/client";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import Branding from "@/components/Branding";
-import { UserType } from "@/types";
+import { UserDataType } from "@/types";
 
 export default function Home() {
-    const { user } = useUser();
-    const [userData, setUserData] = useState<UserType | null>(null);
+    const [userAuth, setUserAuth] = useState<UserDataType | null>(null);
+    const [userData, setUserData] = useState<UserDataType | null>(null);
 
     useEffect(() => {
         async function getUserData() {
-            if (user) {
-                const data = await fetch('/api/user', {
-                    method: 'POST',
-                    body: JSON.stringify({ email: user.email }),
-                })
+            const data = await fetch('/api/user', {
+                credentials: 'include',
+            })
 
-                const userData: UserType = await data.json()
-                setUserData(userData);
-            }
+            const auth = await fetch('/api/auth/me', {
+                credentials: 'include',
+            })
+
+            setUserData(await data.json());
+            setUserAuth(await auth.json());
         }
 
         getUserData();
-    }, [user]);
+    }, []);
 
     const defaultAnimation = {
         hidden: {
@@ -75,16 +75,16 @@ export default function Home() {
             <div className="w-3/4 flex flex-col gap-5">
                 <p className="text-4xl font-bold self-center">Debug</p>
                 <div className="bg-base-200 flex flex-col p-5 rounded-lg shadow-lg gap-5">
-                    <p className="text-xl font-bold">Mongo Database</p>
+                    <p className="text-xl font-bold">Auth Document</p>
                     <div className="bg-base-100 p-5 rounded-lg shadow-lg font-mono overflow-scroll">
-                        <pre>{userData ? JSON.stringify(userData, null, 2) : "Loading..."}</pre>
+                        <pre>{userAuth ? JSON.stringify(userAuth, null, 2) : "Loading..."}</pre>
                     </div>
                 </div>
 
                 <div className="bg-base-200 flex flex-col p-5 rounded-lg shadow-lg gap-5">
-                    <p className="text-xl font-bold">Auth0 User</p>
+                    <p className="text-xl font-bold">Data Document</p>
                     <div className="bg-base-100 p-5 rounded-lg shadow-lg font-mono overflow-scroll">
-                        <pre>{user ? JSON.stringify(user, null, 2) : "Loading..."}</pre>
+                        <pre>{userData ? JSON.stringify(userData, null, 2) : "Loading..."}</pre>
                     </div>
                 </div>
             </div>

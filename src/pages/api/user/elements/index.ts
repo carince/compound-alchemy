@@ -1,40 +1,54 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
-import { dbConnect } from '@/utils/mongodb';
+import { Data } from '@/models/data';
+import dbConnect from '@/utils/db';
+import { verifyToken } from '@/utils/jwt'; // Import the verifyToken function
+import { Logger } from '@/utils/logger';
 
 export default async function handler(
     req: NextApiRequest,
-    res: NextApiResponse) {
-
+    res: NextApiResponse
+) {
     if (req.method === "POST") {
-        const client = await dbConnect();
+        await dbConnect();
 
         try {
-            const collection = client.collection("users");
-
-            const { email, unlocked } = JSON.parse(req.body);
-
-            if (typeof email !== 'string') {
-                return res.status(400).json({ message: "Invalid email parameter!" });
+            const token = req.cookies.token
+            if (!token) {
+                return res.status(401).json({ message: "Unauthorized" });
             }
 
-            const user = await collection.findOne({ email });
+            const decoded = await verifyToken(token);
+            if (!decoded) {
+                return res.status(401).json({ message: "Unauthorized" });
+            }
 
-            if (!user) return res.status(404).json("User not found!");
+            const { unlocked } = JSON.parse(req.body);
 
+            if (typeof unlocked !== 'object') {
+                return res.status(400).json({ message: "Invalid parameters" });
+            }
+
+            // Fetch the user data from the Data model
+            const userData = await Data.findOne({ userId: decoded.userId });
+            if (!userData) {
+                return res.status(404).json({ message: "User data not found!" });
+            }
+
+            // Update the user's progress in the Data collection
             const update = {
                 $set: {
                     ["progress.elements"]: {
                         unlocked
                     }
                 }
-            }
+            };
 
-            const result = await collection.updateOne({ email }, update, { upsert: true });
+            const result = await Data.updateOne({ userId: decoded.userId }, update, { upsert: true });
             return res.status(200).json(result);
         } catch (err: unknown) {
+            Logger.error("API/ELEMENTS", err as string);
             res.status(500).json({ message: "Something went wrong!" });
-            throw new Error(`${err}`)
         }
     } else {
         return res.status(405).json({ message: "Method not allowed!" });

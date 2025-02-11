@@ -1,42 +1,20 @@
 "use client"
 
-import { useUser, withPageAuthRequired } from "@auth0/nextjs-auth0/client";
 import { AnimatePresence } from "motion/react";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 
 import Branding from "@/components/Branding";
 import Draggable from "@/components/Draggable";
 import Spawner from "@/components/Spawner";
 import User from "@/components/User";
-import { UserType } from "@/types";
 import { useDrag } from "@/utils/drag";
 
-export default withPageAuthRequired(function GamePage() {
+export default function GamePage() {
     const sidebarRef = useRef<HTMLDivElement>(null);
-    const { user } = useUser();
     const router = useRouter();
 
-    const { elements, unlockedElements, onSpawnerDragStart, onDragStart } = useDrag({ sidebarRef, user });
-
-    // Effect for fetching user data
-    useEffect(() => {
-        async function checkUserData() {
-            if (!user) return router.push('/api/auth/login');
-            const data = await fetch('/api/user', {
-                method: 'POST',
-                body: JSON.stringify({ email: user.email }),
-            })
-
-            const { progress }: UserType = await data.json()
-            if (progress && !progress?.pretest) {
-                if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return
-                router.push('/tests');
-            }
-        }
-
-        checkUserData()
-    }, []);
+    const { elements, unlockedElements, onSpawnerDragStart, onDragStart } = useDrag({ sidebarRef });
 
     return (
         <div className="absolute w-full h-full flex flex-row bg-base-100 text-white overflow-hidden">
@@ -103,4 +81,4 @@ export default withPageAuthRequired(function GamePage() {
             </div>
         </div >
     );
-})
+}
