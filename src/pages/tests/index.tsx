@@ -1,5 +1,6 @@
 "use client"
 
+import { AnimatePresence, motion } from 'motion/react';
 import { useRouter } from 'next/navigation';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { toast } from "sonner"
@@ -7,7 +8,6 @@ import { toast } from "sonner"
 
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
-import User from '@/components/User';
 import { QuestionType, UserDataType } from '@/types';
 import { posttest, pretest } from '@/utils/questions';
 
@@ -42,6 +42,7 @@ export default function Home() {
                 return
             }
 
+            if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return
             return router.push('/end');
         } catch (error) {
             console.error(error);
@@ -103,34 +104,36 @@ export default function Home() {
     };
 
     return (
-        <div className="h-screen w-screen bg-base-100 flex flex-col items-center py-10 gap-10">
-            {showPopup && (
-                <div className="fixed top-0 left-0 right-0 bottom-0 flex items-center justify-center bg-black bg-opacity-50 z-30">
-                    <div className="bg-base-200 p-5 w-3/4 rounded shadow-lg text-center">
-                        <p className="mb-4 break-words text-left">
-                            Thank you for your participation in our research study. Your contributions are invaluable in helping us achieve the objectives of this project.<br /><br />
-                            As we proceed with the tests, we kindly remind you of the importance of completing them honestly and independently. This study aims to gather accurate and reliable data, which is only possible if all participants provide genuine responses.<br /><br />
-                            <span className="underline">Cheating or seeking external assistance</span> may compromise the results and, ultimately, the validity of our findings. We trust in your integrity and commitment to contributing meaningfully to this research.<br /><br />
-                            Thank you for your cooperation and dedication to this study ❤️.
-                        </p>
-                        <button onClick={() => setShowPopup(false)} className="px-4 py-2 bg-blue-500 text-white rounded">Close</button>
-                    </div>
-                </div>
-            )}
+        <div className="h-min-screen w-screen bg-base-100 flex flex-col items-center py-10 gap-10">
+            <AnimatePresence>
+                {showPopup && (
+                    <motion.div
+                        className="fixed h-screen w-screen top-0 left-0 flex items-center justify-center bg-black/50 p-2 z-30"
+                        exit={{ opacity: 0 }}
+                    >
+                        <div className="bg-base-200 p-5 w-11/12 max-h-full overflow-y-auto rounded shadow-lg text-center">
+                            <p className="mb-4 break-words text-left">
+                                Thank you for your participation in our research study. Your contributions are invaluable in helping us achieve the objectives of this project.<br /><br />
+                                As we proceed with the tests, we kindly remind you of the importance of completing them honestly and independently. This study aims to gather accurate and reliable data, which is only possible if all participants provide genuine responses.<br /><br />
+                                <span className="underline">Cheating or seeking external assistance</span> may compromise the results and, ultimately, the validity of our findings. We trust in your integrity and commitment to contributing meaningfully to this research.<br /><br />
+                                Thank you for your cooperation and dedication to this study ❤️.
+                            </p>
+                            <button onClick={() => setShowPopup(false)} className="px-4 py-2 bg-blue-500 text-white rounded">Close</button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             <div className='Branding flex flex-col items-center justify-center gap-2'>
-                <Branding logoCn='w-16' textCn='text-3xl pl-2' />
-                <p className="text-sm">Made with ❤️ by 12 - St. Agatha of Sicily</p>
+                <Branding classNameLogo="w-16" classNameText="text-3xl pl-1 pt-2" />
+                <p className="text-sm px-4 text-center">Made with ❤️ by 12 - St. Agatha of Sicily</p>
             </div>
 
-            <div className="Content flex flex-col w-full items-center justify-center gap-5">
-                <div className="Header flex flex-row w-3/4 px-5 justify-between">
-                    <p className="text-4xl font-semibold">{test ? "Posttest" : "Pretest"}</p>
-                    <User pictureCn="w-9" className="gap-3" />
-                </div>
+            <div className="Content flex flex-col w-full items-center justify-center gap-5 p-5">
+                <p className="text-4xl font-semibold">{test ? "Posttest" : "Pretest"}</p>
 
                 {questions && questions.map((question, index) => (
-                    <div key={index} className="Question p-5 bg-base-200 rounded shadow-lg w-3/4">
+                    <div key={index} className="Question p-5 bg-base-200 rounded shadow-lg sm:w-3/4">
                         <p className="QuestionText font-semibold mb-2">{`${index + 1}.) ${question.question}`}</p>
                         {question.options.map(option => (
                             <label key={option.value} className="QuestionChoices block">

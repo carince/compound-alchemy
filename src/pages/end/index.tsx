@@ -38,9 +38,9 @@ export default function Home() {
 
     return (
         <div className="h-full w-full flex flex-col items-center bg-base-100">
-            <div className="h-screen flex flex-col justify-center  w-3/4 gap-5">
+            <div className="h-screen flex flex-col justify-center p-5 w-full md:w-3/4 gap-5">
                 <motion.span
-                    className="text-6xl font-bold self-center"
+                    className="text-5xl sm:text-6xl font-bold self-center"
                     variants={{
                         visible: { transition: { staggerChildren: 0.1 } },
                         hidden: {},
@@ -59,7 +59,7 @@ export default function Home() {
                             </motion.span>
                         ))}
                 </motion.span>
-                <motion.div className="text-xl text-left">
+                <motion.div className="text-sm md:text-xl text-left">
                     Thank you for participating in our research! We would like to extend our heartfelt gratitude for your participation in our research study. <br /><br />
 
                     Your time and effort in completing the tests and using our app are deeply appreciated. Your honest and thoughtful responses are invaluable in helping us achieve the objectives of this study. Your contribution brings us closer to gaining meaningful insights and making a positive impact in this field. <br /><br />
@@ -67,7 +67,7 @@ export default function Home() {
                     Once again, thank you for your dedication and support. Your participation is truly valued and has made a significant difference. <br /><br />
 
                     Thank you for being a part of this journey, <br /><br />
-                    <Branding className="w-3/4" logoCn="w-16" textCn="text-3xl leading-8 pb-1" />
+                    <Branding className="w-3/4" classNameLogo="w-12" classNameText="text-2xl pt-1 pb-1" />
                     <p className="text-md pt-2">Made with ❤️ by 12 - St. Agatha of Sicily</p>
                 </motion.div>
             </div>

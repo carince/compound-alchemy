@@ -52,45 +52,39 @@ export default function Login() {
 
   return (
     <div className="h-screen w-screen flex flex-col gap-5 items-center justify-center bg-base-100">
-      <div className="flex flex-col gap-5 bg-base-200 p-10 rounded-xl">
-        <Branding className="flex justify-center" logoCn="w-14" textCn="flex flex-col text-2xl " />
+      <div className="flex flex-col gap-5 sm:bg-base-200 p-10 rounded-xl">
+        <Branding className="flex justify-center" classNameLogo="w-16" classNameText="text-3xl pl-1 pt-2" />
         <p className="text-3xl font-bold text-center">Login</p>
         {/* Email Input */}
-        <div>
-          <p className='text-zinc-500 italic pb-1 text-sm'>IJA Email</p>
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => handleKeyPress(e, passwordInputRef)}
-            className="w-full p-3 rounded-lg border border-zinc-500 bg-base-300"
-          />
-        </div>
+        <input
+          type="email"
+          placeholder="IJA Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={(e) => handleKeyPress(e, passwordInputRef)}
+          className="w-full p-3 rounded-lg border border-zinc-700 bg-base-300"
+        />
 
         {/* Password Input */}
-        <div>
-          <p className='text-zinc-500 italic pb-1 text-sm'>Password</p>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyDown={(e) => handleKeyPress(e, null)}
-            ref={passwordInputRef}
-            className="w-full p-3 rounded-lg border border-zinc-500 bg-base-300"
-          />
-        </div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyDown={(e) => handleKeyPress(e, null)}
+          ref={passwordInputRef}
+          className="w-full p-3 rounded-lg border border-zinc-700 bg-base-300"
+        />
 
         {/* Login Button */}
         <button
           onClick={handleLogin}
-          className="w-full bg-blue-900 disabled:bg-zinc-600 rounded-lg p-3 px-8 text-2xl font-bold text-white flex justify-center"
+          className="w-full bg-blue-900 disabled:bg-zinc-600 rounded-lg p-2 text-xl font-bold text-white flex justify-center"
           disabled={loading}
         >
           {loading ? <Spinner size="w-9" strokeCn="stroke-white" /> : 'Login'}
         </button>
-        <Link className='text-zinc-500 pb-1 underline italic' href="/register">Don&apos;t have an account? Register here</Link>
+        <Link className='text-zinc-500 text-sm pb-1 underline italic' href="/register">Don&apos;t have an account? Register here</Link>
       </div>
     </div>
   );

@@ -33,9 +33,9 @@ export default function Home() {
   }
 
   return (
-    <div className="h-screen w-screen flex flex-col gap-5 items-center justify-center bg-base-100">
-      <Branding className="gap-5" />
-      <p className="text-md">Made with ❤️ by 12 - St. Agatha of Sicily</p>
+    <div className="h-screen w-screen flex flex-col p-5 gap-5 items-center justify-center bg-base-100">
+      <Branding classNameLogo='w-16 sm:w-24' classNameText='text-3xl sm:text-5xl pl-2' />
+      <p className="text-md text-center">Made with ❤️ by 12 - St. Agatha of Sicily</p>
       <button
         onClick={handleStart}
         className="bg-blue-900 disabled:bg-zinc-600 rounded-lg p-3 px-8 text-2xl leading-10 font-bold text-white flex gap-3"

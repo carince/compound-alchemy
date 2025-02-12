@@ -2,7 +2,7 @@ import { nanoid } from "nanoid";
 import React, { createRef, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-import { Item, UserDataType } from "@/types";
+import { Item, ItemWithRef, UserDataType } from "@/types";
 import { averagePosition, combineElements, findIntersections, items } from "@/utils/combinations";
 import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 
@@ -14,8 +14,8 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
         top: 0,
         left: 0
     });
-    const [unlockedElements, setUnlockedElements] = useState<Item[]>([]);
-    const [elements, setElements] = useState<Item[]>([]); // State to manage the list of elements
+    const [unlockedElements, setUnlockedElements] = useState<ItemWithRef[]>([]);
+    const [elements, setElements] = useState<ItemWithRef[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // 
 
     const fetchData = async () => {
@@ -32,21 +32,21 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
             const unlocked = data.progress?.elements?.unlocked;
 
             if (!unlocked || unlocked.length < 4) {
-                setUnlockedElements((state) => {
+                setUnlockedElements(() => {
                     const x = items
                         .slice(0, 4)
                         .map(item => { return { ...item, ref: createRef<HTMLDivElement>() } })
 
-                    return [...state, ...x]
+                    return [...x]
                 });
             }
 
-            setUnlockedElements((state) => {
+            setUnlockedElements(() => {
                 const x = items.filter(
                     (item) => unlocked?.includes(item.key))
                     .map(item => { return { ...item, ref: createRef<HTMLDivElement>() } })
 
-                return [...state, ...x]
+                return [...x]
             });
         } catch (error) {
             console.error(error);
@@ -90,7 +90,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
                     const otherElements = intersections
                         .map((id) => elements.find((e) => e.id === id))
-                        .filter((e): e is Item => e !== undefined);
+                        .filter((e): e is ItemWithRef => e !== undefined);
 
                     const compound = combineElements(targetElement!, otherElements);
 
@@ -112,7 +112,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
         const handleMove = (e: TouchEvent | MouseEvent) => {
             if (dragInfo.id === "") return;
-            e.preventDefault();
+            if (e.cancelable) e.preventDefault();
             const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
             const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
             onMove({ x, y });
@@ -139,8 +139,8 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
     // Set dragId reference and disable scrolling
     function onDragStart(element: Item, e: React.MouseEvent | React.TouchEvent) {
-        if (!element.id || !element.ref || !element.ref.current) return;
         disableScroll();
+        if (!element.id || !element.ref || !element.ref.current) return;
         const x = 'touches' in e ? e.touches[0].clientX : e.clientX;
         const y = 'touches' in e ? e.touches[0].clientY : e.clientY;
 
@@ -160,9 +160,9 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
     // Remove dragId reference and enable scrolling
     function onDragStop(e: MouseEvent | TouchEvent) {
-        e.preventDefault();
-        if (dragInfo.id === "") return;
         enableScroll();
+        if (e.cancelable) e.preventDefault();
+        if (dragInfo.id === "") return;
 
         const prevDragId = dragInfo.id;
         setDragInfo((state) => { return { ...state, id: "" } });
@@ -173,11 +173,10 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
         // Delete the element if it was dragged into the sidebar
         const sidebarRect = sidebarRef.current?.getBoundingClientRect();
-        const targetRect = targetElement.style;
+        const targetRect = targetElement.ref?.current?.getBoundingClientRect();
 
         if (sidebarRect && targetRect &&
-            targetRect.x >= sidebarRect.left && targetRect.x <= sidebarRect.right &&
-            targetRect.y >= sidebarRect.top && targetRect.y <= sidebarRect.bottom) {
+            targetRect.right > sidebarRect.left) {
             setElements((state) => state.filter((e) => e.id !== prevDragId));
             return;
         }
@@ -193,7 +192,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
             const otherElements = intersectedIds
                 .map((id) => elements.find((e) => e.id === id))
-                .filter((e): e is Item => e !== undefined);
+                .filter((e): e is ItemWithRef => e !== undefined);
 
             if (otherElements.length === 0) return state;
 
@@ -205,7 +204,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
                 const notUnlocked = !state.find((e) => e.key === compound.key)
 
                 if (notUnlocked) {
-                    state.push(compound)
+                    state.push({ ...compound, ref: createRef<HTMLDivElement>() })
                     saveUnlockedElements(state)
                 }
 
@@ -214,7 +213,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
 
             // Calculate the new position for the combined element
             const newPos = averagePosition([...otherElements, targetElement]);
-            const newElement: Item = {
+            const newElement: ItemWithRef = {
                 ...targetElement,
                 ...compound,
                 id: nanoid(5),
@@ -242,7 +241,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
         const newId = nanoid(5);
 
         setElements((state) => {
-            const newElement = {
+            const newElement: ItemWithRef = {
                 ...element,
                 id: newId,
                 ref: createRef<HTMLDivElement>(),

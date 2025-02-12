@@ -13,6 +13,8 @@ export type Item = {
     }
 }
 
+export type ItemWithRef = Item & { ref: React.RefObject<HTMLDivElement | null> }
+
 export type UserAuthType = {
     email: string,
     password: string
