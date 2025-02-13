@@ -2,9 +2,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import z from "zod"
 
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
+
+const Form = z.object({
+    email: z.string().email().refine((email) => email.endsWith("@ija.edu.ph"), {
+        message: "Email must be a valid ija.edu.ph address",
+    }),
+    password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
+});
 
 export default function Register() {
     const router = useRouter();
@@ -32,6 +40,16 @@ export default function Register() {
         setLoading(true);
 
         // Validate email, password, and confirm password before sending request
+        try {
+            Form.parse({ email, password });
+        } catch (e) {
+            if (e instanceof z.ZodError) {
+                toast.error(e.errors[0].message);
+                setLoading(false);
+                return;
+            }
+        }
+
         if (!email || !password || !confirmPassword) {
             toast.error('Please fill in all fields');
             setLoading(false);
