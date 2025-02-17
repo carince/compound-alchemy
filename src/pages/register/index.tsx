@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
+import { RegisterForm } from '@/utils/schemas';
 
 export default function RegisterPage() {
     const router = useRouter();
@@ -30,6 +31,13 @@ export default function RegisterPage() {
 
     async function handleRegister() {
         setLoading(true);
+
+        const results = await RegisterForm.safeParseAsync({ email, password });
+        if (!results.success) {
+            toast.error(results.error.errors[0].message);
+            setLoading(false);
+            return;
+        }
 
         if (!email || !password || !confirmPassword) {
             toast.error('Please fill in all fields');
