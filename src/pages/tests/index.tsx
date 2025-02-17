@@ -8,15 +8,15 @@ import { toast } from "sonner"
 
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
-import { QuestionType, UserDataType } from '@/types';
-import { posttest, pretest } from '@/utils/questions';
+import { QuestionType, QuestionTypeWithAnswer, UserDataType } from '@/types';
+import { pretest, survey } from '@/utils/questions';
 
-export default function Home() {
+export default function TestsPage() {
     const router = useRouter();
     const [showPopup, setShowPopup] = useState(true);
     const [answers, setAnswers] = useState<{ [key: number]: string }>({});
     const [test, setTest] = useState<number | null>(null);
-    const [questions, setQuestions] = useState<null | QuestionType[]>(null);
+    const [questions, setQuestions] = useState<null | QuestionType[] | QuestionTypeWithAnswer[]>(null);
     const [submitting, setSubmitting] = useState(false);
 
     const fetchData = async () => {
@@ -36,9 +36,9 @@ export default function Home() {
                 return
             }
 
-            if (!data.progress.posttest) {
+            if (!data.progress.survey) {
                 setTest(1);
-                setQuestions(posttest);
+                setQuestions(survey);
                 return
             }
 
@@ -75,20 +75,24 @@ export default function Home() {
         setSubmitting(true);
 
         let score = 0;
-        questions!.forEach((question, index) => {
-            if (answers[index] === question.answer) {
-                score += 1;
-            }
-        });
+        if (test === 0) {
+            questions!.forEach((question, index) => {
+                if ((question as QuestionTypeWithAnswer).answer && answers[index] === (question as QuestionTypeWithAnswer).answer) {
+                    score += 1;
+                }
+            });
+        }
+
+        const payload = {
+            test,
+            answers,
+            ...(test === 0 && { score })
+        }
 
         const request = await fetch('/api/user/tests', {
             method: 'POST',
             credentials: 'include',
-            body: JSON.stringify({
-                test,
-                score,
-                answers
-            })
+            body: JSON.stringify(payload)
         })
 
         if (!request.ok) {
@@ -130,7 +134,7 @@ export default function Home() {
             </div>
 
             <div className="Content flex flex-col w-full items-center justify-center gap-5 p-5">
-                <p className="text-4xl font-semibold">{test ? "Posttest" : "Pretest"}</p>
+                <p className="text-4xl font-semibold">{test === null ? "" : test === 0 ? "Pretest" : "Survey"}</p>
 
                 {questions && questions.map((question, index) => (
                     <div key={index} className="Question p-5 bg-base-200 rounded shadow-lg sm:w-3/4">

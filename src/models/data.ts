@@ -7,13 +7,13 @@ const dataSchema = new mongoose.Schema({
             score: { type: Number },
             answers: { type: Map, of: String },
         },
-        posttest: {
-            score: { type: Number },
+        survey: {
             answers: { type: Map, of: String },
         },
         elements: {
             unlocked: { type: [Number] },
-        }
+        },
+        level: { type: Number, enum: [1, 2, 3] }
     }
 });
 

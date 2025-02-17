@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
 
-export default function Login() {
+export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

@@ -25,37 +25,31 @@ export default async function handler(
                 return res.status(401).json({ message: "Unauthorized" });
             }
 
-            const { answers, score, test } = JSON.parse(req.body);
-
-
             // Fetch the user data from the Data model
             const userData = await Data.findOne<UserDataType>({ userId: decoded.userId });
             if (!userData) {
                 return res.status(404).json({ message: "User data not found!" });
             }
 
-            // Determine whether the test is pretest or posttest
-            const testType = test ? "survey" : "pretest";
+            const { level } = JSON.parse(req.body);
 
-            // Check if the user has already completed the test
-            if (userData.progress && userData.progress[testType]?.answers) {
-                return res.status(400).json({ message: "Test already completed!" });
+
+            // Check if the user has already completed the level
+            if (userData.progress && userData.progress.level && userData.progress.level > level) {
+                return res.status(400).json({ message: "Invalid level" });
             }
 
             // Update the user's progress in the Data collection
             const update = {
                 $set: {
-                    [`progress.${testType}`]: {
-                        ...(test === 0 && { score }),
-                        answers
-                    }
+                    'progress.level': level
                 }
             };
 
             const result = await Data.updateOne({ userId: decoded.userId }, update, { upsert: true });
             return res.status(200).json(result);
         } catch (err: unknown) {
-            Logger.error("API/TESTS", err as string);
+            Logger.error("API/LEVEL", err as string);
             res.status(500).json({ message: "Something went wrong!" });
         }
     } else {

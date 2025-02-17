@@ -20,14 +20,15 @@ const geistMono = Geist_Mono({
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       <motion.div
         key={router.route}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: .5 }}
       >
-        <main className={`antialiased ${geistSans.className} ${geistMono.className}`}>
+        <main className={`antialiased ${geistSans.className} ${geistMono.className} overflow-hidden`}>
           <Component {...pageProps} />
           <Toaster richColors={true} theme="dark" />
         </main>

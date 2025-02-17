@@ -24,10 +24,8 @@ export default function Home() {
 
     if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
 
-    console.log(progress)
-
     if (!progress?.pretest) return router.push('/tests');
-    if (progress?.posttest) return router.push('/end');
+    if (progress?.survey) return router.push('/end');
 
     router.push('/game');
   }

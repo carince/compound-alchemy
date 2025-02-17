@@ -1,6 +1,6 @@
 "use client"
 
-import { AnimatePresence } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { useRouter } from "next/navigation";
 import React, { useRef } from "react";
 
@@ -34,14 +34,18 @@ export default function GamePage() {
                         }
                     </AnimatePresence>
                 </div>
-                <picture
-                    className={`md:w-3/4 flex justify-center select-none ${elements.length !== 0 ? "hidden" : ""}`}
-                >
-                    <source media="(min-width: 58rem)" srcSet="drag-help.svg" />
-                    <img
-                        src="/drag-help-mobile.svg" alt="drag-help">
-                    </img>
-                </picture>
+                <AnimatePresence>
+                    <motion.picture
+                        className="md:w-3/4 flex justify-center select-none"
+                        animate={{ opacity: elements.length === 0 ? 1 : 0 }}
+                    // exit={{ opacity: 0 }}
+                    >
+                        <source media="(min-width: 58rem)" srcSet="drag-help.svg" />
+                        <img
+                            src="/drag-help-mobile.svg" alt="drag-help">
+                        </img>
+                    </motion.picture>
+                </AnimatePresence>
                 <div className="absolute md:hidden left-0 bottom-0 flex p-2 flex-col mt-auto select-none">
                     <span className="text-2xl leading-6 font-bold text-white/25">Compound</span>
                     <span className="text-2xl leading-6 font-bold text-[#4b77d1]/25">Alchemy</span>

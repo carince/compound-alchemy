@@ -5,40 +5,42 @@ export const items: Item[] = [
     { key: 1, name: "Oxygen", symbol: "O" },
     { key: 2, name: "Sodium", symbol: "Na" },
     { key: 3, name: "Chlorine", symbol: "Cl" },
-    { key: 4, name: "Water", symbol: "H2O" }, // H + O
-    { key: 5, name: "Sodium Chloride", symbol: "NaCl" }, // Na + Cl (table salt)
-    { key: 6, name: "Hydrogen Peroxide", symbol: "H2O2" }, // H2O + O
-    { key: 7, name: "Hydrochloric Acid", symbol: "HCl" }, // H + Cl
-    { key: 8, name: "Sodium Hydroxide", symbol: "NaOH" }, // Na + H2O
-    { key: 9, name: "Salt Water", symbol: "NaCl + H2O" }, // NaCl + H2O
-    { key: 10, name: "Ozone", symbol: "O3" }, // O + O2
-    { key: 11, name: "Sodium Bicarbonate", symbol: "NaHCO3" }, // NaOH + CO2
-    { key: 12, name: "Carbon Dioxide", symbol: "CO2" }, // C + O2
-    { key: 13, name: "Glucose", symbol: "C6H12O6" }, // H2O + CO2 + Sunlight
-    { key: 14, name: "Ethanol", symbol: "C2H5OH" }, // Glucose + Fermentation
-    { key: 15, name: "Vinegar", symbol: "CH3COOH" }, // Ethanol + O2
-    { key: 16, name: "Ammonia", symbol: "NH3" }, // N + H
-    { key: 17, name: "Methane", symbol: "CH4" }, // C + H4
-    { key: 18, name: "Calcium Carbonate", symbol: "CaCO3" }, // Ca + CO2
-    { key: 19, name: "Baking Powder", symbol: "NaHCO3 + Acid" }, // NaHCO3 + CH3COOH
+    { key: 4, name: "Carbon", symbol: "C" },
+    { key: 5, name: "Water", symbol: "H2O" }, // H + O
+    { key: 6, name: "Sodium Chloride", symbol: "NaCl" }, // Na + Cl
+    { key: 7, name: "Sodium Oxide", symbol: "Na2O" }, // Na + O
+    { key: 8, name: "Sodium Peroxide", symbol: "Na2O2" }, // Na2O + O
+    { key: 9, name: "Sodium Hypochlorite", symbol: "NaClO" }, // Na + O + Cl
+    { key: 10, name: "Sodium Hydroxide", symbol: "NaOH" }, // H2O + Na2O
+    { key: 11, name: "Sodium Carbonate", symbol: "Na2CO3" }, // Na2O + CO2
+    { key: 12, name: "Sodium Hydride", symbol: "NaH" }, // Na + H
+    { key: 13, name: "Hydrogen Chloride", symbol: "HCl" }, // H + Cl
+    { key: 14, name: "Chlorine Dioxide", symbol: "ClO2" }, // Cl + O
+    { key: 15, name: "Methane", symbol: "CH4" },
+    { key: 16, name: "Carbon Dioxide", symbol: "CO2" }, // C + O2
+    { key: 17, name: "Hydrogen Peroxide", symbol: "H2O2" }, // H2O + O
+    { key: 18, name: "Hypochlorous Acid", symbol: "HOCl" }, // H2O + Cl
+    { key: 19, name: "Dichlorine Monoxide", symbol: "Cl2O" }, // Cl + O
+    { key: 20, name: "Carbonic Acid", symbol: "H2CO3" } // CO2 + H2O
 ];
 
 export const combinations = [
-    { elements: [0, 1], compound: 4 }, // H + O -> Water
-    { elements: [2, 3], compound: 5 }, // Na + Cl -> Sodium Chloride
-    { elements: [4, 1], compound: 6 }, // Water + O -> Hydrogen Peroxide
-    { elements: [0, 3], compound: 7 }, // H + Cl -> Hydrochloric Acid
-    { elements: [2, 4], compound: 8 }, // Na + H2O -> Sodium Hydroxide
-    { elements: [5, 4], compound: 9 }, // NaCl + H2O -> Salt Water
-    { elements: [1, 1], compound: 10 }, // O + O2 -> Ozone
-    { elements: [8, 12], compound: 11 }, // NaOH + CO2 -> Sodium Bicarbonate
-    { elements: [4, 12, 13], compound: 13 }, // Water + CO2 + Sunlight -> Glucose
-    { elements: [13, 10], compound: 14 }, // Glucose + Fermentation -> Ethanol
-    { elements: [14, 1], compound: 15 }, // Ethanol + O2 -> Vinegar
-    { elements: [0, 16], compound: 16 }, // N + H -> Ammonia
-    { elements: [17, 0], compound: 17 }, // C + H4 -> Methane
-    { elements: [18, 12], compound: 18 }, // Ca + CO2 -> Calcium Carbonate
-    { elements: [11, 15], compound: 19 }, // NaHCO3 + Vinegar -> Baking Powder
+    { elements: [0, 1], compound: 5 }, // H + O -> H2O
+    { elements: [4, 1], compound: 16 }, // C + O2 -> CO2
+    { elements: [2, 3], compound: 6 }, // Na + Cl -> NaCl
+    { elements: [2, 1], compound: 7 }, // Na + O -> Na2O
+    { elements: [7, 1], compound: 8 }, // Na2O + O -> Na2O2
+    { elements: [2, 3], compound: 9 }, // Na + Cl -> NaClO (adjusted to keep two elements)
+    { elements: [5, 7], compound: 10 }, // H2O + Na2O -> NaOH
+    { elements: [7, 16], compound: 11 }, // Na2O + CO2 -> Na2CO3
+    { elements: [2, 0], compound: 12 }, // Na + H -> NaH
+    { elements: [0, 3], compound: 13 }, // H + Cl -> HCl
+    { elements: [3, 1], compound: 14 }, // Cl + O -> ClO2
+    { elements: [0, 16], compound: 15 }, // C + H -> CH4
+    { elements: [5, 1], compound: 17 }, // H2O + O -> H2O2
+    { elements: [5, 3], compound: 18 }, // H2O + Cl -> HOCl
+    { elements: [3, 1], compound: 19 }, // Cl + O -> Cl2O
+    { elements: [16, 5], compound: 20 } // CO2 + H2O -> H2CO3
 ];
 
 export function boxesIntersect(a: Item, b: Item): boolean {

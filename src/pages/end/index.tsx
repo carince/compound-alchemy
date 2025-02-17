@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import Branding from "@/components/Branding";
 import { UserDataType } from "@/types";
 
-export default function Home() {
+export default function EndingPage() {
     const [userAuth, setUserAuth] = useState<UserDataType | null>(null);
     const [userData, setUserData] = useState<UserDataType | null>(null);
 

@@ -29,7 +29,7 @@ export type UserDataType = {
                 [key: string]: number
             }
         }
-        posttest?: {
+        survey?: {
             score: number
             answers: {
                 [key: string]: number
@@ -38,6 +38,7 @@ export type UserDataType = {
         elements?: {
             unlocked: number[]
         }
+        level?: 1 | 2 | 3
     }
 }
 
@@ -53,5 +54,6 @@ export type Option = {
 export type QuestionType = {
     question: string;
     options: Option[];
-    answer: string;
 };
+
+export type QuestionTypeWithAnswer = QuestionType & { answer: string | null }

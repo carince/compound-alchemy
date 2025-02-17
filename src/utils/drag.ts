@@ -14,7 +14,12 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
         top: 0,
         left: 0
     });
-    const [unlockedElements, setUnlockedElements] = useState<ItemWithRef[]>([]);
+    const [unlockedElements, setUnlockedElements] = useState<ItemWithRef[]>(
+        items.slice(0, 5)
+            .map(item => {
+                return { ...item, ref: createRef<HTMLDivElement>() }
+            })
+    );
     const [elements, setElements] = useState<ItemWithRef[]>([]); // State to manage the list of elements
     const isTouchCapable = useIsTouchDevice(); // 
 
@@ -25,20 +30,16 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
                 credentials: 'include',
             });
 
-            if (!res.ok) return toast.error("An error occured while fetching your data, please reload the website and try again.");
+            if (!res.ok) {
+                return toast.error("An error occured while fetching your data, please login again and try again.")
+            };
 
             const data = await res.json() as UserDataType;
 
             const unlocked = data.progress?.elements?.unlocked;
 
-            if (!unlocked || unlocked.length < 4) {
-                setUnlockedElements(() => {
-                    const x = items
-                        .slice(0, 4)
-                        .map(item => { return { ...item, ref: createRef<HTMLDivElement>() } })
-
-                    return [...x]
-                });
+            if (!unlocked || unlocked.length < 5) {
+                return saveUnlockedElements(unlockedElements)
             }
 
             setUnlockedElements(() => {

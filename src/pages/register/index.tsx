@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
 
-export default function Register() {
+export default function RegisterPage() {
     const router = useRouter();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -56,7 +56,7 @@ export default function Register() {
         }
 
         toast.success('Account created successfully');
-        router.push('/');
+        return router.push('/');
     }
 
     return (
@@ -84,6 +84,7 @@ export default function Register() {
                     ref={passwordInputRef}
                     className="w-full p-3 rounded-lg border border-zinc-700 bg-base-300"
                 />
+
                 {/* Confirm Password Input */}
                 <input
                     type="password"
