@@ -8,7 +8,7 @@ import Branding from "@/components/Branding";
 import Draggable from "@/components/Draggable";
 import Spawner from "@/components/Spawner";
 import User from "@/components/User";
-import { useDrag } from "@/utils/drag";
+import { useDrag } from "@/pages/game/drag";
 
 export default function GamePage() {
     const sidebarRef = useRef<HTMLDivElement>(null);

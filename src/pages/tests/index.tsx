@@ -9,7 +9,7 @@ import { toast } from "sonner"
 import Branding from '@/components/Branding';
 import Spinner from '@/components/Spinner';
 import { QuestionType, QuestionTypeWithAnswer, UserDataType } from '@/types';
-import { pretest, survey } from '@/utils/questions';
+import { pretest, survey } from '@/pages/tests/questions';
 
 export default function TestsPage() {
     const router = useRouter();
