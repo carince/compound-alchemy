@@ -72,40 +72,23 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
                 const dragElement = state.find((el) => el.id === dragInfo.id);
                 if (!dragElement) return state;
 
+                const sidebarRect = sidebarRef.current?.getBoundingClientRect();
+                const targetRect = dragElement.ref?.current?.getBoundingClientRect();
+
+                const isOverSidebar = sidebarRect && targetRect && targetRect.right > sidebarRect.left ? 1 : 0
+
                 const updatedElement = {
                     ...dragElement,
                     style: {
                         x: dragInfo.left - (dragInfo.x - x),
                         y: dragInfo.top - (dragInfo.y - y),
-                        hover: 0
+                        isOverSidebar
                     }
                 };
 
                 state = state
                     .filter((element) => element.id !== dragInfo.id)
                     .concat(updatedElement);
-
-                const intersections = findIntersections(state, dragInfo.id);
-                state = state.map((element) => {
-                    const targetElement = state.find((e) => e.id === dragInfo.id);
-
-                    const otherElements = intersections
-                        .map((id) => elements.find((e) => e.id === id))
-                        .filter((e): e is ItemWithRef => e !== undefined);
-
-                    const compound = combineElements(targetElement!, otherElements);
-
-                    if (intersections.includes(element.id)) {
-                        if (compound !== null) {
-                            element.style!.hover = 1;
-                        } else {
-                            element.style!.hover = 2;
-                        }
-                    } else {
-                        element.style!.hover = 0;
-                    }
-                    return element;
-                });
 
                 return state;
             });
@@ -222,7 +205,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
                 style: {
                     x: newPos.x,
                     y: newPos.y,
-                    hover: 0
+                    isOverSidebar: 0
                 }
             };
 
@@ -249,7 +232,7 @@ export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElemen
                 style: {
                     x: left,
                     y: top,
-                    hover: 0
+                    isOverSidebar: 0
                 }
             };
             return [...state, newElement];

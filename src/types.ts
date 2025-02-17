@@ -7,7 +7,7 @@ export type Item = {
     symbol: string
     ref?: React.RefObject<HTMLDivElement | null>
     style?: {
-        hover: number
+        isOverSidebar: number
         x: number
         y: number
     }
