@@ -31,7 +31,6 @@ export default function RegisterPage() {
     async function handleRegister() {
         setLoading(true);
 
-        // Validate email, password, and confirm password before sending request
         if (!email || !password || !confirmPassword) {
             toast.error('Please fill in all fields');
             setLoading(false);
