@@ -11,7 +11,6 @@ import { AnimatePresence, motion } from "motion/react";
 
 export default function GamePage() {
     const [validMolecules, setValidMolecules] = useState<{ [key in MoleculeNames]?: boolean }>({});
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [ionicBuilderOpen, setIonicBuilderOpen] = useState(false);
 
     return (
@@ -20,31 +19,9 @@ export default function GamePage() {
                 <Branding className="flex items-center sm:pt-3 md:pt-0" classNameLogo="w-10 sm:w-12" classNameText="hidden md:flex flex-col text-xl" />
 
                 <div className="flex items-center gap-2">
-                    <button
-                        className="md:hidden btn btn-sm btn-ghost rounded-lg"
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                    >
-                        <IoMenuOutline className="text-2xl" />
-                    </button>
                     <User pictureCn="block w-8 sm:w-9" className="bg-base-300/70 px-3 sm:px-4 rounded-lg gap-3 sm:gap-5 hover:bg-base-300 transition-colors" textCn="text-xs sm:text-sm md:text-md" withLogout={true} />
                 </div>
             </div>
-
-            {mobileMenuOpen && (
-                <div className="fixed z-[9] top-[3.2rem] w-full bg-base-300/95 backdrop-blur-sm md:hidden shadow-lg animate-slideDown">
-                    <div className="flex flex-col p-3 py-4 space-y-3">
-                        <a href="#" className="px-4 py-2 hover:bg-base-100/30 rounded-lg flex items-center gap-2">
-                            <IoChevronForward /> Home
-                        </a>
-                        <a href="#" className="px-4 py-2 hover:bg-base-100/30 rounded-lg flex items-center gap-2 bg-base-100/20">
-                            <IoChevronForward /> Current Lesson
-                        </a>
-                        <a href="#" className="px-4 py-2 hover:bg-base-100/30 rounded-lg flex items-center gap-2">
-                            <IoChevronForward /> All Lessons
-                        </a>
-                    </div>
-                </div>
-            )}
 
             <div className="h-screen overflow-scroll flex flex-col mt-14 sm:mt-16 md:mt-28 p-3 sm:p-5 md:p-8 text-sm max-w-4xl mx-auto w-full">
                 <div className="bg-base-300/30 p-4 sm:p-6 md:p-8 rounded-xl sm:rounded-2xl shadow-xl mb-8">
