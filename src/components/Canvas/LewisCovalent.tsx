@@ -337,7 +337,14 @@ export function LewisCovalent({ currentMolecule, setValidMolecules }: {
 
             {/* Validation messages */}
             <div className="h-full w-[20rem] min-w-xs">
-                <h3 className="font-bold mb-2">Helper:</h3>
+                {/* Instructions */}
+                <div className="my-3 p-2 bg-blue-100 border border-blue-300 rounded">
+                    <p className="text-sm text-blue-800">
+                        <strong>Instructions:</strong> Press the atoms to spawn electrons to try to create a valid structure!
+                    </p>
+                </div>
+
+                <h3 className="font-bold mb-2">Status:</h3>
                 {validationMessages.length === 0 ? (
                     <div className="text-green-600">✓ Valid structure!</div>
                 ) : (
