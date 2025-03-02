@@ -1,7 +1,6 @@
 import { periodicTable } from "@/data/periodicTable";
 
 export function getValenceElectrons(elementSymbol: string): number {
-    // Find the element in the periodic table
     const element = periodicTable.find((el) => el.symbol === elementSymbol);
 
     if (!element) {
@@ -11,7 +10,6 @@ export function getValenceElectrons(elementSymbol: string): number {
     // Use the full electron configuration (e.g., "1s2 2s2 2p4")
     const electronConfig = element.electron_configuration;
 
-    // Split the configuration into individual orbitals
     const orbitals = electronConfig.split(" ");
 
     // Get the outermost shell number (e.g., "2" for "2s2 2p4")
@@ -57,3 +55,41 @@ export function getElementName(elementSymbol: string): string {
 
     return element.name;
 };
+
+export function isMetal(elementSymbol: string): boolean {
+    const element = periodicTable.find((el) => el.symbol === elementSymbol);
+
+    if (!element) {
+        throw new Error(`Element with symbol ${elementSymbol} not found.`);
+    }
+
+    if (element.category) {
+        if (element.category.toLowerCase().includes("metal")) {
+            if (element.category.toLowerCase() === "metalloid") {
+                return false;
+            }
+            return true;
+        }
+
+        const metalCategories = ["alkali", "alkaline", "transition", "lanthanide", "actinide"];
+        if (metalCategories.some(cat => element.category.toLowerCase().includes(cat))) {
+            return true;
+        }
+    }
+
+    if (element.group && element.period) {
+        if ((element.group <= 2 && element.symbol !== "H") ||
+            (element.group >= 3 && element.group <= 12)) {
+            return true;
+        }
+
+        if (element.group >= 13 && element.group <= 16) {
+            const postTransitionMetals = ["Al", "Ga", "In", "Sn", "Tl", "Pb", "Bi", "Po"];
+            return postTransitionMetals.includes(element.symbol);
+        }
+    }
+
+    // Default case - not a metal
+    return false;
+}
+

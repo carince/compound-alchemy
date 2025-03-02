@@ -1,10 +1,10 @@
 import React from 'react';
-import { Stage, Layer, Rect } from 'react-konva';
+import { Layer, Rect } from 'react-konva';
 
 export function Grid() {
-    const width = 400;
+    const width = 360;
     const height = 300;
-    const boxSize = 25;
+    const boxSize = 30;
 
     const boxes = [];
     for (let i = 0; i < width / boxSize; i++) {

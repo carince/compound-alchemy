@@ -10,6 +10,7 @@ export type AtomConfig = {
 export type Molecule = {
     atoms: AtomConfig[];
     bonds: [string, string][]; // Pairs of connected atom IDs
+    isIonic?: boolean
 };
 
 export type AtomData = {
@@ -25,6 +26,12 @@ export type BondData = {
 export type MoleculeNames = keyof typeof molecules;
 
 export type MoleculeWithNames = Molecule & { name: MoleculeNames };
+
+export type DraggedElectron = {
+    sourceAtomId: string;
+    x: number;
+    y: number;
+};
 
 export type ValidationMessage = {
     type: "error" | "warning" | "info";

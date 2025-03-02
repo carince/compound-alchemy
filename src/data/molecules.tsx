@@ -1,9 +1,9 @@
 import { Molecule } from "@/types";
 
 function calculatePosition(x: number, y: number): { x: number, y: number } {
-    const centerX = 200;
-    const centerY = 150;
-    const offset = 25;
+    const centerX = 360 / 2;
+    const centerY = 300 / 2;
+    const offset = 30;
     return {
         x: centerX + x * offset,
         y: centerY + y * offset,
@@ -11,6 +11,23 @@ function calculatePosition(x: number, y: number): { x: number, y: number } {
 }
 
 export const molecules: Record<string, Molecule> = {
+    NaCl: {
+        atoms: [
+            {
+                id: "Na1",
+                element: "Na",
+                position: calculatePosition(-4, 0),
+                bonds: [],
+            },
+            {
+                id: "Cl1",
+                element: "Cl",
+                position: calculatePosition(0, 0),
+                bonds: [],
+            },
+        ],
+        bonds: [],
+    },
     O2: {
         atoms: [
             {
@@ -82,218 +99,34 @@ export const molecules: Record<string, Molecule> = {
             ["O1", "H2"],
         ],
     },
-    CH4: {
+    Na2Cl4: {
+        isIonic: true,
         atoms: [
             {
-                id: "C1",
-                element: "C",
-                position: calculatePosition(0, 0),
-                bonds: ["H1", "H2", "H3", "H4"],
+                id: "Na1",
+                element: "Na",
+                position: calculatePosition(-6, 0),
+                bonds: [],
             },
             {
-                id: "H1",
-                element: "H",
+                id: "Na2",
+                element: "Na",
                 position: calculatePosition(-3, 0),
-                bonds: ["C1"],
+                bonds: [],
             },
             {
-                id: "H2",
-                element: "H",
-                position: calculatePosition(0, 3),
-                bonds: ["C1"],
-            },
-            {
-                id: "H3",
-                element: "H",
-                position: calculatePosition(0, -3),
-                bonds: ["C1"],
-            },
-            {
-                id: "H4",
-                element: "H",
+                id: "Cl1",
+                element: "Cl",
                 position: calculatePosition(3, 0),
-                bonds: ["C1"],
+                bonds: [],
+            },
+            {
+                id: "Cl2",
+                element: "Cl",
+                position: calculatePosition(6, 0),
+                bonds: [],
             },
         ],
-        bonds: [
-            ["C1", "H1"],
-            ["C1", "H2"],
-            ["C1", "H3"],
-            ["C1", "H4"],
-        ],
-    },
-    NH3: {
-        atoms: [
-            {
-                id: "N1",
-                element: "N",
-                position: calculatePosition(0, 0),
-                bonds: ["H1", "H2", "H3"],
-            },
-            {
-                id: "H1",
-                element: "H",
-                position: calculatePosition(-3, 0),
-                bonds: ["N1"],
-            },
-            {
-                id: "H2",
-                element: "H",
-                position: calculatePosition(3, 0),
-                bonds: ["N1"],
-            },
-            {
-                id: "H3",
-                element: "H",
-                position: calculatePosition(0, -3),
-                bonds: ["N1"],
-            },
-        ],
-        bonds: [
-            ["N1", "H1"],
-            ["N1", "H2"],
-            ["N1", "H3"],
-        ],
-    },
-    C2H4: {
-        atoms: [
-            {
-                id: "C1",
-                element: "C",
-                position: calculatePosition(-2, 0),
-                bonds: ["C2", "H1", "H2"],
-            },
-            {
-                id: "C2",
-                element: "C",
-                position: calculatePosition(2, 0),
-                bonds: ["C1", "H3", "H4"],
-            },
-            {
-                id: "H1",
-                element: "H",
-                position: calculatePosition(-4, 2),
-                bonds: ["C1"],
-            },
-            {
-                id: "H2",
-                element: "H",
-                position: calculatePosition(-4, -2),
-                bonds: ["C1"],
-            },
-            {
-                id: "H3",
-                element: "H",
-                position: calculatePosition(4, 2),
-                bonds: ["C2"],
-            },
-            {
-                id: "H4",
-                element: "H",
-                position: calculatePosition(4, -2),
-                bonds: ["C2"],
-            },
-        ],
-        bonds: [
-            ["C1", "C2"],
-            ["C1", "H1"],
-            ["C1", "H2"],
-            ["C2", "H3"],
-            ["C2", "H4"],
-        ],
-    },
-    C2H2: {
-        atoms: [
-            {
-                id: "C1",
-                element: "C",
-                position: calculatePosition(-2, 0),
-                bonds: ["C2", "H1"],
-            },
-            {
-                id: "C2",
-                element: "C",
-                position: calculatePosition(2, 0),
-                bonds: ["C1", "H2"],
-            },
-            {
-                id: "H1",
-                element: "H",
-                position: calculatePosition(-5, 0),
-                bonds: ["C1"],
-            },
-            {
-                id: "H2",
-                element: "H",
-                position: calculatePosition(5, 0),
-                bonds: ["C2"],
-            },
-        ],
-        bonds: [
-            ["C1", "C2"],
-            ["C1", "H1"],
-            ["C2", "H2"],
-        ],
-    },
-    C2H6: {
-        atoms: [
-            {
-                id: "C1",
-                element: "C",
-                position: calculatePosition(-2, 0),
-                bonds: ["C2", "H1", "H2", "H3"],
-            },
-            {
-                id: "C2",
-                element: "C",
-                position: calculatePosition(2, 0),
-                bonds: ["C1", "H4", "H5", "H6"],
-            },
-            {
-                id: "H1",
-                element: "H",
-                position: calculatePosition(-5, 0),
-                bonds: ["C1"],
-            },
-            {
-                id: "H2",
-                element: "H",
-                position: calculatePosition(-2, -3),
-                bonds: ["C1"],
-            },
-            {
-                id: "H3",
-                element: "H",
-                position: calculatePosition(-2, 3),
-                bonds: ["C1"],
-            },
-            {
-                id: "H4",
-                element: "H",
-                position: calculatePosition(5, 0),
-                bonds: ["C2"],
-            },
-            {
-                id: "H5",
-                element: "H",
-                position: calculatePosition(2, -3),
-                bonds: ["C2"],
-            },
-            {
-                id: "H6",
-                element: "H",
-                position: calculatePosition(2, 3),
-                bonds: ["C2"],
-            },
-        ],
-        bonds: [
-            ["C1", "C2"],
-            ["C1", "H1"],
-            ["C1", "H2"],
-            ["C1", "H3"],
-            ["C2", "H4"],
-            ["C2", "H5"],
-            ["C2", "H6"],
-        ],
+        bonds: [],
     },
 };
