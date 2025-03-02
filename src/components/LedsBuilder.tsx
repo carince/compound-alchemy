@@ -1,105 +1,25 @@
-import { AtomConfig, AtomData, BondData, Molecule, ValidationMessage } from "@/types";
-import { useState, useEffect } from "react";
+"use client"
 
+import { useState, useEffect, Dispatch, SetStateAction, useRef } from "react";
+import { Stage, Layer, Circle, Line, Text, Group } from "react-konva";
+import { AtomData, BondData, Molecule, MoleculeNames, MoleculeWithNames, ValidationMessage } from "@/types";
+import { getElementName, getValenceElectrons } from "@/utils/elementUtils";
+import { Grid } from "@/components/CanvasComponents/Grid";
 
-const molecules: Record<string, Molecule> = {
-  fiveAtoms: {
-    atoms: [
-      {
-        id: "C1",
-        element: "C",
-        position: { x: 125, y: 125 },
-        bonds: ["O1", "O2", "O3", "O4"],
-      },
-      { id: "O1", element: "O1", position: { x: 50, y: 50 }, bonds: ["C1"] },
-      { id: "O2", element: "O2", position: { x: 200, y: 50 }, bonds: ["C1"] },
-      { id: "O3", element: "O3", position: { x: 50, y: 200 }, bonds: ["C1"] },
-      { id: "O4", element: "O4", position: { x: 200, y: 200 }, bonds: ["C1"] },
-    ],
-    bonds: [
-      ["C1", "O1"],
-      ["C1", "O2"],
-      ["C1", "O3"],
-      ["C1", "O4"],
-    ],
-  },
-  O2: {
-    atoms: [
-      {
-        id: "O1",
-        element: "O",
-        position: { x: 100, y: 125 },
-        bonds: ["O2"],
-      },
-      {
-        id: "O2",
-        element: "O",
-        position: { x: 200, y: 125 },
-        bonds: ["O1"],
-      },
-    ],
-    bonds: [
-      ["O1", "O2"],
-    ],
-  },
-  // Add more molecules here
-};
-
-const getValenceElectrons = (element: string): number[] => {
-  const baseElement = element.replace(/[0-9]/g, ""); // Remove numbers from element names
-  switch (baseElement) {
-    case "H":
-      return [1];
-    case "C":
-      return [4];
-    case "O":
-      return [6]; // Common valence states: 6 (but could be others in different compounds)
-    case "N":
-      return [5];
-    case "F":
-      return [7];
-    case "Cl":
-      return [7];
-    default:
-      return [];
-  }
-};
-
-const LEDSGridBuilder = () => {
-  const [currentMolecule] = useState<Molecule>(molecules.O2);
+function LEDSGridBuilder({ currentMolecule, setValidMolecules }: {
+  currentMolecule: MoleculeWithNames,
+  setValidMolecules: Dispatch<SetStateAction<{
+    [x: string]: boolean | undefined;
+  }>>
+}) {
   const [atomsData, setAtomsData] = useState<Record<string, AtomData>>({});
   const [bondsData, setBondsData] = useState<Record<string, BondData>>({});
   const [validationMessages, setValidationMessages] = useState<ValidationMessage[]>([]);
 
-  const getBondDirection = (
-    from: AtomConfig,
-    to: AtomConfig
-  ): "top" | "right" | "bottom" | "left" => {
-    const dx = to.position.x - from.position.x;
-    const dy = to.position.y - from.position.y;
-
-    if (Math.abs(dx) > Math.abs(dy)) {
-      return dx > 0 ? "right" : "left";
-    }
-    return dy > 0 ? "bottom" : "top";
-  };
-
-  // Restore getOccupiedSides
-  const getOccupiedSides = (
-    atom: AtomConfig
-  ): ("top" | "right" | "bottom" | "left")[] => {
-    return atom.bonds.map((connectedId) => {
-      const connectedAtom = currentMolecule.atoms.find(
-        (a) => a.id === connectedId
-      )!;
-      return getBondDirection(atom, connectedAtom);
-    });
-  };
-
   const handleAtomClick = (atomId: string) => {
     setAtomsData((prev) => {
-      const current = prev[atomId] || { electrons: 0, occupiedSides: [] };
-      const maxElectrons = 6;
+      const current = prev[atomId] || { electrons: 0 };
+      const maxElectrons = 8;
       const newElectrons =
         current.electrons < maxElectrons ? current.electrons + 1 : 0;
 
@@ -107,7 +27,6 @@ const LEDSGridBuilder = () => {
         ...prev,
         [atomId]: {
           electrons: newElectrons,
-          occupiedSides: current.occupiedSides,
         },
       };
     });
@@ -131,7 +50,7 @@ const LEDSGridBuilder = () => {
   };
 
   const getAtomData = (atomId: string): AtomData => {
-    return atomsData[atomId] || { electrons: 0, occupiedSides: [] };
+    return atomsData[atomId] || { electrons: 0 };
   };
 
   const getBondData = (bondKey: string): BondData => {
@@ -168,29 +87,175 @@ const LEDSGridBuilder = () => {
       const totalValence = loneElectrons + bondOrdersSum;
 
       // Check against possible valences
-      if (!possibleValences.includes(totalValence)) {
+      if (possibleValences !== totalValence) {
         messages.push({
           type: "error",
           atomId: atom.id,
-          message: `${element} has ${totalValence} valence electrons (common: ${possibleValences.join(
-            "/"
-          )})`,
+          message: `${element} only has ${totalValence} valence electrons. It should have ${possibleValences}!`,
         });
       }
     });
 
     setValidationMessages(messages);
+    setValidMolecules((prev) => {
+      return {
+        ...prev,
+        [currentMolecule.name]: messages.length === 0,
+      }
+    })
   };
 
+  // Call validation when atom or bond data changes
   useEffect(() => {
     validateStructure();
-  }, [atomsData, bondsData]);
+  }, [atomsData, bondsData, currentMolecule.name]);
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "500px" }}>
+    <div className="flex flex-col md:flex-row gap-5 p-5 items-center justify-center rounded-lg shadow-lg border border-gray-200">
+      {/* Playground */}
+      <div className="Playground">
+        <Stage
+          width={400}
+          height={300}
+          className="border border-gray-200 rounded-xl overflow-hidden shadow-lg"
+        >
+          <Grid />
+          <Layer>
+            {/* Render bonds */}
+            {currentMolecule.bonds.map(([fromId, toId]) => {
+              const fromAtom = currentMolecule.atoms.find((a) => a.id === fromId)!;
+              const toAtom = currentMolecule.atoms.find((a) => a.id === toId)!;
+              const bondKey = `${fromId}-${toId}`;
+              const bondData = getBondData(bondKey);
+
+              return (
+                <Group
+                  key={bondKey}
+                  onClick={() => handleBondClick(bondKey)}
+                  onTap={() => handleBondClick(bondKey)}
+                >
+                  <Line
+                    points={[fromAtom.position.x, fromAtom.position.y, toAtom.position.x, toAtom.position.y]}
+                    stroke="transparent"
+                    strokeWidth={20}
+                  />
+                  {bondData.type === "single" && (
+                    <Line
+                      points={[fromAtom.position.x, fromAtom.position.y, toAtom.position.x, toAtom.position.y]}
+                      stroke="black"
+                      strokeWidth={2}
+                    />
+                  )}
+                  {bondData.type === "double" && (
+                    <>
+                      <Line
+                        points={[fromAtom.position.x, fromAtom.position.y - 3, toAtom.position.x, toAtom.position.y - 3]}
+                        stroke="black"
+                        strokeWidth={2}
+                      />
+                      <Line
+                        points={[fromAtom.position.x, fromAtom.position.y + 3, toAtom.position.x, toAtom.position.y + 3]}
+                        stroke="black"
+                        strokeWidth={2}
+                      />
+                    </>
+                  )}
+                  {bondData.type === "triple" && (
+                    <>
+                      <Line
+                        points={[fromAtom.position.x, fromAtom.position.y - 5, toAtom.position.x, toAtom.position.y - 5]}
+                        stroke="black"
+                        strokeWidth={2}
+                      />
+                      <Line
+                        points={[fromAtom.position.x, fromAtom.position.y, toAtom.position.x, toAtom.position.y]}
+                        stroke="black"
+                        strokeWidth={2}
+                      />
+                      <Line
+                        points={[fromAtom.position.x, fromAtom.position.y + 5, toAtom.position.x, toAtom.position.y + 5]}
+                        stroke="black"
+                        strokeWidth={2}
+                      />
+                    </>
+                  )}
+                </Group>
+              );
+            })}
+
+            {/* Render atoms and electrons */}
+            {currentMolecule.atoms.map((atom) => {
+              const data = getAtomData(atom.id);
+
+              return (
+                <Group
+                  key={atom.id}
+                  onClick={() => handleAtomClick(atom.id)}
+                  onTap={() => handleAtomClick(atom.id)}
+                >
+                  {/* Atom circle */}
+                  <Circle
+                    x={atom.position.x}
+                    y={atom.position.y}
+                    radius={25}
+                    fill="white"
+                    stroke="black"
+                    strokeWidth={1}
+                  />
+
+                  {/* Atom symbol */}
+                  <Text
+                    x={atom.position.x - 20}
+                    y={atom.position.y - 20}
+                    text={atom.element}
+                    fontSize={16}
+                    fontFamily="Arial"
+                    width={40}
+                    height={40}
+                    fill="black"
+                    align="center"
+                    verticalAlign="middle"
+                  />
+
+                  {/* Render electrons on all sides */}
+                  {(["top", "right", "bottom", "left"] as const).map((side, index) => {
+                    const electronsOnSide = Math.min(
+                      2,
+                      Math.max(0, data.electrons - index * 2)
+                    );
+
+                    return (
+                      <Group key={side}>
+                        {Array.from({ length: electronsOnSide }).map((_, i) => {
+                          const offsetX = side === "left" ? -24 : side === "right" ? 24 : 0;
+                          const offsetY = side === "top" ? -24 : side === "bottom" ? 24 : 0;
+                          const spacing = i === 0 ? -6 : 6;
+
+                          return (
+                            <Circle
+                              key={i}
+                              x={atom.position.x + offsetX + (side === "top" || side === "bottom" ? spacing : 0)}
+                              y={atom.position.y + offsetY + (side === "left" || side === "right" ? spacing : 0)}
+                              radius={4}
+                              fill="gray"
+                              stroke="black"
+                              strokeWidth={0.5}
+                            />
+                          );
+                        })}
+                      </Group>
+                    );
+                  })}
+                </Group>
+              );
+            })}
+          </Layer>
+        </Stage>
+      </div>
+
       {/* Validation messages */}
-      <div className="fixed top-4 right-4 bg-white p-4 rounded-lg shadow-lg border border-gray-200 max-w-xs">
-        <h3 className="font-bold mb-2">Structure Feedback:</h3>
+      <div className="h-full bg-white p-4 rounded-lg shadow-lg border border-gray-200 min-w-xs">
+        <h3 className="font-bold mb-2">Helper:</h3>
         {validationMessages.length === 0 ? (
           <div className="text-green-600">✓ Valid structure!</div>
         ) : (
@@ -203,132 +268,57 @@ const LEDSGridBuilder = () => {
             </div>
           ))
         )}
+
+        {/* Molecule charge table */}
+        <div className="mt-4">
+          <h4 className="font-bold mb-2">Molecule Charge:</h4>
+          <table className="min-w-full bg-white border border-black shadow-lg">
+            <thead>
+              <tr>
+                <th className="py-2 px-4 border-b">Atom</th>
+                <th className="py-2 px-4 border-b">Charge</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.values(
+                currentMolecule.atoms.reduce((acc, atom) => {
+                  const atomData = getAtomData(atom.id);
+                  const element = atom.element.replace(/[0-9]/g, "");
+                  const possibleValences = getValenceElectrons(element);
+                  const loneElectrons = atomData.electrons;
+
+                  // Calculate bond orders sum
+                  let bondOrdersSum = 0;
+                  atom.bonds.forEach((connectedId) => {
+                    const bondKey = [atom.id, connectedId].sort().join("-");
+                    const bondData = bondsData[bondKey] || { type: "single" };
+                    bondOrdersSum +=
+                      bondData.type === "single" ? 1 : bondData.type === "double" ? 2 : 3;
+                  });
+
+                  const totalValence = loneElectrons + bondOrdersSum;
+                  const formalCharge = possibleValences - totalValence;
+
+                  if (!acc[element]) {
+                    acc[element] = { element, formalCharge, count: 0 };
+                  }
+                  acc[element].formalCharge += formalCharge;
+                  acc[element].count += 1;
+
+                  return acc;
+                }, {} as Record<string, { element: string; formalCharge: number; count: number }>)
+              ).map(({ element, formalCharge, count }) => (
+                <tr key={element}>
+                  <td className="py-2 px-1 text-center border-b border-x">{getElementName(element)} × {count}</td>
+                  <td className="py-2 px-1 text-center border-b border-x">{formalCharge}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-
-      {/* Render bonds */}
-      {currentMolecule.bonds.map(([fromId, toId]) => {
-        const fromAtom = currentMolecule.atoms.find((a) => a.id === fromId)!;
-        const toAtom = currentMolecule.atoms.find((a) => a.id === toId)!;
-        const fromCenter = {
-          x: fromAtom.position.x + 27,
-          y: fromAtom.position.y + 27,
-        };
-        const toCenter = {
-          x: toAtom.position.x + 27,
-          y: toAtom.position.y + 27,
-        };
-        const bondKey = `${fromId}-${toId}`;
-        const bondData = getBondData(bondKey);
-
-        return (
-          <div
-            key={bondKey}
-            onClick={() => handleBondClick(bondKey)}
-            style={{
-              position: "absolute",
-              left: fromCenter.x,
-              top: fromCenter.y,
-              width: Math.sqrt(
-                Math.pow(toCenter.x - fromCenter.x, 2) +
-                Math.pow(toCenter.y - fromCenter.y, 2)
-              ),
-              transform: `rotate(${Math.atan2(
-                toCenter.y - fromCenter.y,
-                toCenter.x - fromCenter.x
-              )}rad)`,
-              transformOrigin: "0 0",
-              cursor: "pointer",
-            }}
-          >
-            {bondData.type === "single" && (
-              <div className="absolute h-[2px] bg-black w-full" />
-            )}
-            {bondData.type === "double" && (
-              <>
-                <div className="absolute h-[2px] bg-black top-[-3px] w-full" />
-                <div className="absolute h-[2px] bg-black top-[3px] w-full" />
-              </>
-            )}
-            {bondData.type === "triple" && (
-              <>
-                <div className="absolute h-[2px] bg-black top-[-5px] w-full" />
-                <div className="absolute h-[2px] bg-black w-full" />
-                <div className="absolute h-[2px] bg-black top-[5px] w-full" />
-              </>
-            )}
-          </div>
-        );
-      })}
-
-      {/* Render atoms and electrons */}
-      {currentMolecule.atoms.map((atom) => {
-        const data = getAtomData(atom.id);
-        const occupiedSides = getOccupiedSides(atom);
-        const availableSides = (
-          ["top", "right", "bottom", "left"] as const
-        ).filter((side) => !occupiedSides.includes(side));
-
-        return (
-          <div
-            key={atom.id}
-            className="absolute w-14 h-14 rounded-full bg-white border-black border-[0.5px]"
-            style={{
-              left: atom.position.x,
-              top: atom.position.y,
-            }}
-            onClick={() => handleAtomClick(atom.id)}
-          >
-            <p className="w-full h-full flex justify-center items-center select-none">
-              {atom.element}
-            </p>
-
-            {/* Render electrons */}
-            {availableSides.map((side, index) => {
-              const electronsOnSide = Math.min(
-                2,
-                Math.max(0, data.electrons - index * 2)
-              );
-
-              return (
-                <div
-                  key={side}
-                  className="absolute flex gap-1"
-                  style={{
-                    ...getElectronPosition(side),
-                    flexDirection:
-                      side === "top" || side === "bottom" ? "row" : "column",
-                  }}
-                >
-                  {Array.from({ length: electronsOnSide }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="w-2 h-2 bg-zinc-500 border-[0.2px] rounded-full"
-                    />
-                  ))}
-                </div>
-              );
-            })}
-          </div>
-        );
-      })}
     </div>
   );
-};
-
-// Helper function for electron positioning
-const getElectronPosition = (side: string): React.CSSProperties => {
-  switch (side) {
-    case "top":
-      return { top: "-3px", left: "50%", transform: "translateX(-50%)" };
-    case "right":
-      return { right: "-3px", top: "50%", transform: "translateY(-50%)" };
-    case "bottom":
-      return { bottom: "-3px", left: "50%", transform: "translateX(-50%)" };
-    case "left":
-      return { left: "-3px", top: "50%", transform: "translateY(-50%)" };
-    default:
-      return {};
-  }
-};
+}
 
 export default LEDSGridBuilder;

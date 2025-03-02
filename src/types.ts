@@ -1,3 +1,5 @@
+import { molecules } from "./data/molecules";
+
 export type AtomConfig = {
     id: string;
     element: string;
@@ -12,7 +14,6 @@ export type Molecule = {
 
 export type AtomData = {
     electrons: number;
-    occupiedSides: ("top" | "right" | "bottom" | "left")[];
 };
 
 export type BondType = "single" | "double" | "triple";
@@ -20,6 +21,10 @@ export type BondType = "single" | "double" | "triple";
 export type BondData = {
     type: BondType;
 };
+
+export type MoleculeNames = keyof typeof molecules;
+
+export type MoleculeWithNames = Molecule & { name: MoleculeNames };
 
 export type ValidationMessage = {
     type: "error" | "warning" | "info";
