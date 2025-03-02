@@ -3,7 +3,7 @@ import React, { createRef, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Item, ItemWithRef, UserDataType } from "@/types";
-import { averagePosition, combineElements, findIntersections, items } from "@/pages/game/combinations";
+import { averagePosition, combineElements, findIntersections, items } from "@/pages/3/combinations";
 import { disableScroll, enableScroll, useIsTouchDevice } from "@/utils/touch";
 
 export const useDrag = ({ sidebarRef }: { sidebarRef: React.RefObject<HTMLElement | null> }) => {

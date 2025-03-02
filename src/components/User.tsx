@@ -54,8 +54,8 @@ export default function User({ withLogout, className, pictureCn, textCn }: { wit
 
     return (
         user && (
-            <div className="flex items-center justify-between">
-                <div className={twMerge("flex gap-2 items-center justify-between ", className)}>
+            <div className={twMerge("flex items-center justify-between", className)}>
+                <div className={twMerge("flex gap-2 items-center justify-between ")}>
                     <p className={twMerge("capitalize font-semibold", textCn)}>{name}</p>
                 </div>
                 {
