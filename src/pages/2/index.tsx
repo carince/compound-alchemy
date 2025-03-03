@@ -3,7 +3,7 @@ import React, { useState } from "react";
 
 import Branding from "@/components/Branding";
 import User from "@/components/User";
-import { LewisCovalent } from "@/components/Canvas/LewisCovalent";
+import { CovalentBuilder } from "@/components/Canvas/LewisCovalent";
 import { molecules } from "@/data/molecules";
 import { MoleculeNames } from "@/types";
 
@@ -19,7 +19,7 @@ export default function GamePage() {
             </div>
 
             <div className="flex flex-col items-center justify-center h-full w-full">
-                <LewisCovalent currentMolecule={{ ...molecules.O2, name: "O2" }} setValidMolecules={setValidMolecules} />
+                <CovalentBuilder currentMolecule={{ ...molecules.O2, name: "O2" }} setValidMolecules={setValidMolecules} />
             </div>
         </div >
     );

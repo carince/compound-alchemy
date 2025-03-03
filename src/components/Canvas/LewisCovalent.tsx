@@ -20,7 +20,7 @@ const STYLES = {
     }
 };
 
-export function LewisCovalent({ currentMolecule, setValidMolecules }: {
+export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
     currentMolecule: MoleculeWithNames,
     setValidMolecules: Dispatch<SetStateAction<{ [x: string]: boolean | undefined; }>>
 }) {
@@ -102,8 +102,23 @@ export function LewisCovalent({ currentMolecule, setValidMolecules }: {
 
     // Call validation when atom or bond data changes
     useEffect(() => {
-        validateStructure();
-    }, [atomsData, bondsData, validateStructure]);
+        // Use a ref to track if we've validated this specific data already
+        const timer = setTimeout(() => {
+            validateStructure();
+        }, 0);
+        
+        return () => clearTimeout(timer);
+    }, [validateStructure]);
+    
+    // Update validation whenever atom or bond data changes
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            validateStructure();
+        }, 0);
+        
+        return () => clearTimeout(timer);
+    }, [Object.keys(atomsData).length, Object.values(atomsData).map(a => a.electrons).join(','),
+        Object.keys(bondsData).length, Object.values(bondsData).map(b => b.type).join(',')]);
 
     // Render a bond between atoms
     const renderBond = useCallback(([fromId, toId]: string[]) => {
@@ -340,7 +355,7 @@ export function LewisCovalent({ currentMolecule, setValidMolecules }: {
                 {/* Instructions */}
                 <div className="my-3 p-2 bg-blue-100 border border-blue-300 rounded">
                     <p className="text-sm text-blue-800">
-                        <strong>Instructions:</strong> Press the atoms to spawn electrons to try to create a valid structure!
+                        <strong>Instructions:</strong> Press the atoms to spawn electrons, and the bonds to switch bond types to try to create a valid structure!
                     </p>
                 </div>
 

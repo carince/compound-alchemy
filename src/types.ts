@@ -121,3 +121,12 @@ export type QuestionType = {
 };
 
 export type QuestionTypeWithAnswer = QuestionType & { answer: string | null }
+
+export interface PageTimeData {
+    pageId: string;
+    totalTimeSpent: number; // in milliseconds
+    visits: number;
+    lastVisitTimestamp: number;
+    firstVisitTimestamp: number;
+  }
+  
