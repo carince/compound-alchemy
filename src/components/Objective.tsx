@@ -161,7 +161,11 @@ export default function Objective({
                             transition: { duration: 0.1, ease: "easeInOut" }
                         }}
                         onClick={handleMinimize}
-                        className="w-6 h-6 flex items-center justify-center rounded-full bg-base-300 hover:bg-base-200 text-sm text-white ml-3"
+                        onTouchEnd={(e) => {
+                            e.preventDefault();
+                            handleMinimize();
+                        }}
+                        className="w-6 h-6 flex items-center justify-center rounded-full bg-base-300 hover:bg-base-200 text-sm text-white ml-3 touch-manipulation"
                     >
                         {minimized ? "+" : "−"}
                     </motion.button>

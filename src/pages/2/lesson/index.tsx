@@ -249,27 +249,29 @@ export default function GamePage() {
                                 <button
                                     className={`p-5 rounded-lg flex flex-col md:flex-row justify-between shadow-lg transition-transform transform hover:scale-10 ${userData?.progress.level2.cou.completed
                                         ? "bg-green-500/50 hover:bg-green-400/50"
-                                        : "bg-red-500/50 hover:bg-red-400/50"
+                                        : "bg-base-300 hover:bg-base-300/50"
                                         }`}
                                     onClick={() => {
                                         if (!userData?.progress.level2.cou.completed) {
                                             router.push("/2/cou");
                                         }
                                     }}
-                                    disabled={!validMolecules.O2 || userData?.progress.level2.cou.completed}
+                                    disabled={userData?.progress.level2.cou.completed}
                                 >
                                     <div className="flex flex-row gap-5 items-center pb-2 border-b border-gray-800 md:p-0 md:border-0">
                                         <IoInformationCircleOutline className="text-blue-400 text-4xl" />
                                         <span>Checking of Understanding</span>
                                     </div>
                                     <p className="pt-2 md:p-0 text-sm sm:text-base text-left">
-                                        {userData?.progress.level2.cou.completed && "You have completed this activity."}
+                                        {userData?.progress.level2.cou.completed ? "You have completed this activity." : "Test your knowledge about covalent bonding!"}
                                     </p>
                                 </button>
                                 <button
                                     className={`p-5 rounded-lg flex flex-col md:flex-row justify-between shadow-lg transition-transform transform hover:scale-10 ${userData?.progress.level2.quiz.completed
                                         ? "bg-green-500/50 hover:bg-green-400/50"
-                                        : "bg-red-500/50 hover:bg-red-400/50"
+                                        : userData?.progress.level2.cou.completed ?
+                                            "bg-base-300 hover:bg-base-300/50"
+                                            : "bg-red-500/50 hover:bg-red-400/50"
                                         }`}
                                     onClick={() => {
                                         if (!userData?.progress.level2.quiz.completed && userData?.progress.level2.cou.completed) {
@@ -286,7 +288,7 @@ export default function GamePage() {
                                         {userData?.progress.level2.quiz.completed
                                             ? "You have completed this activity."
                                             : !userData?.progress.level2.cou.completed
-                                                ? "You need to complete the task above to proceed."
+                                                ? "You need to complete Checking of Understanding to proceed."
                                                 : "Complete this activity to proceed."}
                                     </p>
                                 </button>

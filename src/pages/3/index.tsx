@@ -49,7 +49,7 @@ export default function GamePage() {
             targetElement: "Sodium Carbonate"
         },
         {
-            text: "Carbonic Acid (H₂CO₃) by mixing Carbon Dioxide with Water.",
+            text: "Discover Carbonic Acid (H₂CO₃)",
             targetElement: "Carbonic Acid"
         },
     ]);
@@ -151,6 +151,7 @@ export default function GamePage() {
                     <motion.button
                         className="bg-green-700 text-white text-sm md:text-lg rounded-lg p-2 w-full relative"
                         onClick={() => router.push("/end")}
+                        onTouchEnd={() => router.push("/end")}
                         initial={{ scale: 1 }}
                         transition={{
                             duration: 1.5,
