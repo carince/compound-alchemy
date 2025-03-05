@@ -24,6 +24,7 @@ export default function Home() {
 
     // if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
 
+    if (currentLevel === 3) return router.push('/3');
     return router.push(`/${currentLevel}/lesson`);
   }
 
