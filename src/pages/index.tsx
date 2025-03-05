@@ -20,14 +20,11 @@ export default function Home() {
       return router.push('/login');
     }
 
-    const { progress }: UserDataType = await request.json();
+    const { currentLevel }: UserDataType = await request.json();
 
-    if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
+    // if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
 
-    if (!progress?.pretest) return router.push('/tests');
-    if (progress?.survey) return router.push('/end');
-
-    router.push('/game');
+    return router.push(`/${currentLevel}/lesson`);
   }
 
   return (

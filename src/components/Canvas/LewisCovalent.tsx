@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect, useCallback, useMemo, Dispatch, SetStateAction } from "react";
-import { Stage, Layer, Circle, Line, Text, Group } from "react-konva";
-import { AtomData, BondData, MoleculeWithNames, ValidationMessage } from "@/types";
-import { getElementName, getValenceElectrons } from "@/utils/elements";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
+import { Circle, Group, Layer, Line, Stage, Text } from "react-konva";
+
 import { Grid } from "@/components/Canvas/Grid";
+import { AtomData, BondData, Molecule, ValidationMessage } from "@/types";
+import { getElementName, getValenceElectrons } from "@/utils/elements";
 
 // Constants for styling and layout
 const STYLES = {
@@ -13,15 +14,15 @@ const STYLES = {
     text: { fontSize: 20, fontFamily: "Arial", width: 40, height: 40 },
     bond: { clickWidth: 20, strokeWidth: 2, color: "black", spacing: { single: 0, double: 3, triple: 5 } },
     positions: {
-        top: { x: 0, y: -40 },
-        bottom: { x: 0, y: 40 },
-        right: { x: 40, y: 0 },
-        left: { x: -40, y: 0 }
+        top: { x: 0, y: -30 },
+        bottom: { x: 0, y: 30 },
+        right: { x: 30, y: 0 },
+        left: { x: -30, y: 0 }
     }
 };
 
 export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
-    currentMolecule: MoleculeWithNames,
+    currentMolecule: Molecule,
     setValidMolecules: Dispatch<SetStateAction<{ [x: string]: boolean | undefined; }>>
 }) {
     const [atomsData, setAtomsData] = useState<Record<string, AtomData>>({});
@@ -96,7 +97,7 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
         setValidationMessages(messages);
         setValidMolecules(prev => ({
             ...prev,
-            [currentMolecule.name]: messages.length === 0
+            [currentMolecule.formula]: messages.length === 0
         }));
     }, [atomsData, bondsData, currentMolecule, getAtomData, getBondData, setValidMolecules]);
 
@@ -106,19 +107,19 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
         const timer = setTimeout(() => {
             validateStructure();
         }, 0);
-        
+
         return () => clearTimeout(timer);
     }, [validateStructure]);
-    
+
     // Update validation whenever atom or bond data changes
     useEffect(() => {
         const timer = setTimeout(() => {
             validateStructure();
         }, 0);
-        
+
         return () => clearTimeout(timer);
     }, [Object.keys(atomsData).length, Object.values(atomsData).map(a => a.electrons).join(','),
-        Object.keys(bondsData).length, Object.values(bondsData).map(b => b.type).join(',')]);
+    Object.keys(bondsData).length, Object.values(bondsData).map(b => b.type).join(',')]);
 
     // Render a bond between atoms
     const renderBond = useCallback(([fromId, toId]: string[]) => {
@@ -153,20 +154,20 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
                     <>
                         <Line
                             points={[
-                                fromAtom.position.x,
-                                fromAtom.position.y - STYLES.bond.spacing.double,
-                                toAtom.position.x,
-                                toAtom.position.y - STYLES.bond.spacing.double
+                                fromAtom.position.x - STYLES.bond.spacing.double,
+                                fromAtom.position.y,
+                                toAtom.position.x - STYLES.bond.spacing.double,
+                                toAtom.position.y
                             ]}
                             stroke={STYLES.bond.color}
                             strokeWidth={STYLES.bond.strokeWidth}
                         />
                         <Line
                             points={[
-                                fromAtom.position.x,
-                                fromAtom.position.y + STYLES.bond.spacing.double,
-                                toAtom.position.x,
-                                toAtom.position.y + STYLES.bond.spacing.double
+                                fromAtom.position.x + STYLES.bond.spacing.double,
+                                fromAtom.position.y,
+                                toAtom.position.x + STYLES.bond.spacing.double,
+                                toAtom.position.y
                             ]}
                             stroke={STYLES.bond.color}
                             strokeWidth={STYLES.bond.strokeWidth}
@@ -177,10 +178,10 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
                     <>
                         <Line
                             points={[
-                                fromAtom.position.x,
-                                fromAtom.position.y - STYLES.bond.spacing.triple,
-                                toAtom.position.x,
-                                toAtom.position.y - STYLES.bond.spacing.triple
+                                fromAtom.position.x - STYLES.bond.spacing.triple,
+                                fromAtom.position.y,
+                                toAtom.position.x - STYLES.bond.spacing.triple,
+                                toAtom.position.y
                             ]}
                             stroke={STYLES.bond.color}
                             strokeWidth={STYLES.bond.strokeWidth}
@@ -192,10 +193,10 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
                         />
                         <Line
                             points={[
-                                fromAtom.position.x,
-                                fromAtom.position.y + STYLES.bond.spacing.triple,
-                                toAtom.position.x,
-                                toAtom.position.y + STYLES.bond.spacing.triple
+                                fromAtom.position.x + STYLES.bond.spacing.triple,
+                                fromAtom.position.y,
+                                toAtom.position.x + STYLES.bond.spacing.triple,
+                                toAtom.position.y
                             ]}
                             stroke={STYLES.bond.color}
                             strokeWidth={STYLES.bond.strokeWidth}
@@ -205,17 +206,6 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
             </Group>
         );
     }, [currentMolecule.atoms, getBondData, handleBondClick]);
-
-    // Distribute electrons evenly around an atom
-    const distributeElectrons = useCallback((totalElectrons: number, sides = 4) => {
-        const distribution = Array(sides).fill(0);
-        for (let i = 0; i < totalElectrons; i++) {
-            // Find side with fewest electrons
-            const minIndex = distribution.indexOf(Math.min(...distribution));
-            distribution[minIndex]++;
-        }
-        return distribution;
-    }, []);
 
     // Calculate molecule charge
     const moleculeChargeData = useMemo(() => (
@@ -336,7 +326,7 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
             <div className="Playground">
                 <Stage
                     width={360}
-                    height={300}
+                    height={360}
                     className="bg-zinc-400 border border-zinc-800 rounded-xl overflow-hidden shadow-lg"
                 >
                     <Grid />
@@ -375,23 +365,67 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
 
                 {/* Molecule charge table */}
                 <div className="mt-4">
-                    <h4 className="font-bold mb-2">Molecule Charge:</h4>
-                    <table className="min-w-full bg-base-200 border border-zinc-600 shadow-lg">
-                        <thead>
-                            <tr>
-                                <th className="py-2 px-4 border border-zinc-600">Atom</th>
-                                <th className="py-2 px-4 border border-zinc-600">Charge</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {moleculeChargeData.map(({ element, formalCharge, count }) => (
-                                <tr key={element}>
-                                    <td className="py-2 px-1 text-center border border-zinc-600">{getElementName(element)} × {count}</td>
-                                    <td className="py-2 px-1 text-center border border-zinc-600">{formalCharge}</td>
+                    <h4 className="font-bold mb-2">Formal Charges:</h4>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-base-200 border border-zinc-600 shadow-lg">
+                            <thead>
+                                <tr>
+                                    <th className="py-2 px-4 border border-zinc-600">Atom</th>
+                                    <th className="py-2 px-4 border border-zinc-600">Charge</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {currentMolecule.atoms.map(atom => {
+                                    const atomData = getAtomData(atom.id);
+                                    const element = atom.element.replace(/[0-9]/g, "");
+                                    const possibleValences = getValenceElectrons(element);
+                                    const loneElectrons = atomData.electrons;
+
+                                    // Calculate bond orders sum
+                                    let bondOrdersSum = 0;
+                                    atom.bonds.forEach(connectedId => {
+                                        const bondKey = [atom.id, connectedId].sort().join("-");
+                                        const bondData = getBondData(bondKey);
+                                        bondOrdersSum += bondData.type === "single" ? 1 : bondData.type === "double" ? 2 : 3;
+                                    });
+
+                                    const totalValence = loneElectrons + bondOrdersSum;
+                                    const formalCharge = possibleValences - totalValence;
+
+                                    return (
+                                        <tr key={atom.id}>
+                                            <td className="py-2 px-1 text-center border border-zinc-600">
+                                                {getElementName(element)} ({atom.id})
+                                            </td>
+                                            <td className={`py-2 px-1 text-center border border-zinc-600 font-bold ${formalCharge > 0 ? 'text-red-600' :
+                                                formalCharge < 0 ? 'text-blue-600' :
+                                                    'text-green-600'
+                                                }`}>
+                                                {formalCharge > 0 && '+'}{formalCharge !== 0 ? formalCharge : 'neutral'}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                                <tr className="">
+                                    <td className="py-2 px-1 text-center border border-zinc-600 font-bold">Total</td>
+                                    <td className={`py-2 px-1 text-center border border-zinc-600 font-bold ${moleculeChargeData.reduce((sum, { formalCharge }) => sum + formalCharge, 0) > 0 ? 'text-red-600' :
+                                        moleculeChargeData.reduce((sum, { formalCharge }) => sum + formalCharge, 0) < 0 ? 'text-blue-600' :
+                                            'text-green-600'
+                                        }`}>
+                                        {(() => {
+                                            const total = moleculeChargeData.reduce((sum, { formalCharge }) => sum + formalCharge, 0);
+                                            return total > 0 ? `+${total}` : total < 0 ? total : 'neutral';
+                                        })()}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div className="flex justify-between text-xs mt-2 px-1">
+                        <span className="text-blue-600">■ Negative</span>
+                        <span className="text-green-600">■ Neutral</span>
+                        <span className="text-red-600">■ Positive</span>
+                    </div>
                 </div>
             </div>
         </div>

@@ -6,7 +6,7 @@ export const createToken = async (userId: string): Promise<string> => {
     return new SignJWT({ userId })
         .setProtectedHeader({ alg: 'HS256' })
         .setIssuedAt()
-        .setExpirationTime('1h')
+        .setExpirationTime('1d')
         .sign(new TextEncoder().encode(process.env.AUTH_SECRET as string));
 };
 

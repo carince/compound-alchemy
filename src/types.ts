@@ -1,4 +1,21 @@
-import { molecules } from "./data/molecules";
+
+import { Document, Types } from 'mongoose';
+
+
+export type Item = {
+    id?: string
+    key: number
+    name: string
+    symbol: string
+    ref?: React.RefObject<HTMLDivElement | null>
+    style?: {
+        isOverSidebar: number
+        x: number
+        y: number
+    }
+}
+
+export type ItemWithRef = Item & { ref: React.RefObject<HTMLDivElement | null> }
 
 export type AtomConfig = {
     id: string;
@@ -8,9 +25,9 @@ export type AtomConfig = {
 };
 
 export type Molecule = {
+    formula: string;
     atoms: AtomConfig[];
     bonds: [string, string][]; // Pairs of connected atom IDs
-    isIonic?: boolean
 };
 
 export type AtomData = {
@@ -22,10 +39,6 @@ export type BondType = "single" | "double" | "triple";
 export type BondData = {
     type: BondType;
 };
-
-export type MoleculeNames = keyof typeof molecules;
-
-export type MoleculeWithNames = Molecule & { name: MoleculeNames };
 
 export type DraggedElectron = {
     sourceAtomId: string;
@@ -84,26 +97,33 @@ export type UserAuthType = {
     password: string
 }
 
-export type UserDataType = {
-    userId: string
-    progress?: {
-        pretest?: {
-            score: number
-            answers: {
-                [key: string]: number
-            }
-        }
-        survey?: {
-            score: number
-            answers: {
-                [key: string]: number
-            }
-        }
-        elements?: {
-            unlocked: number[]
-        }
-        level?: 1 | 2 | 3
-    }
+export interface ProgressLevel {
+    contentRead: boolean;
+    cou: {
+        completed: boolean;
+        answers: Map<string, string>;
+    };
+    quiz: {
+        completed: boolean;
+        score: number;
+        answers: Map<string, string>;
+    };
+}
+
+export interface Progress {
+    level1: ProgressLevel;
+    level2: ProgressLevel;
+    level3: {
+        elements: {
+            unlocked: number[];
+        };
+    };
+}
+
+export interface UserDataType extends Document {
+    userId: Types.ObjectId;
+    currentLevel: 1 | 2 | 3;
+    progress: Progress;
 }
 
 export type SessionType = {
@@ -118,15 +138,12 @@ export type Option = {
 export type QuestionType = {
     question: string;
     options: Option[];
+    answer: string;
 };
-
-export type QuestionTypeWithAnswer = QuestionType & { answer: string | null }
 
 export interface PageTimeData {
     pageId: string;
-    totalTimeSpent: number; // in milliseconds
-    visits: number;
+    totalTimeSpent: number; // in milliseconds  
     lastVisitTimestamp: number;
     firstVisitTimestamp: number;
-  }
-  
+}

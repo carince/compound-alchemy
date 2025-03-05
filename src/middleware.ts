@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { verifyToken } from '@/utils/jwt'
 
-const protectedRoutes = ['/game', '/tests', 'end']
+const protectedRoutes = ['/1/lesson', '/1/cou', '/1/quiz', '/2/lesson', '/2/cou', '/2/quiz', "/3"]
 
 export default async function middleware(req: NextRequest) {
     const path = req.nextUrl.pathname

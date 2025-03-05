@@ -1,8 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 
 import { Data } from '@/models/data';
+import { UserDataType } from '@/types';
 import dbConnect from '@/utils/db';
-import { verifyToken } from '@/utils/jwt'; // Import the verifyToken function
+import { verifyToken } from '@/utils/jwt';
 import { Logger } from '@/utils/logger';
 
 export default async function handler(
@@ -18,36 +19,42 @@ export default async function handler(
                 return res.status(401).json({ message: "Unauthorized" });
             }
 
+            // Verify token
             const decoded = await verifyToken(token);
             if (!decoded) {
                 return res.status(401).json({ message: "Unauthorized" });
             }
 
-            const { unlocked } = JSON.parse(req.body);
-
-            if (typeof unlocked !== 'object') {
-                return res.status(400).json({ message: "Invalid parameters" });
-            }
-
             // Fetch the user data from the Data model
-            const userData = await Data.findOne({ userId: decoded.userId });
+            const userData = await Data.findOne<UserDataType>({ userId: decoded.userId });
             if (!userData) {
                 return res.status(404).json({ message: "User data not found!" });
+            }
+
+            const { answers, score } = JSON.parse(req.body);
+
+
+            // Check if the user has already completed it.
+            if (userData.progress && userData.progress.level1 && userData.progress.level1.quiz && userData.progress.level1.quiz.completed) {
+                return res.status(400).json({ message: "Already completed!" });
             }
 
             // Update the user's progress in the Data collection
             const update = {
                 $set: {
-                    ["progress.elements"]: {
-                        unlocked
-                    }
+                    'progress.level1.quiz': {
+                        answers,
+                        score,
+                        completed: true
+                    },
+                    'currentLevel': 2
                 }
             };
 
             const result = await Data.updateOne({ userId: decoded.userId }, update, { upsert: true });
             return res.status(200).json(result);
         } catch (err: unknown) {
-            Logger.error("API/ELEMENTS", err as string);
+            Logger.error("API/LEVEL", err as string);
             res.status(500).json({ message: "Something went wrong!" });
         }
     } else {

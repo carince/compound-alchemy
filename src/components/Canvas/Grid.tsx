@@ -3,7 +3,7 @@ import { Layer, Rect } from 'react-konva';
 
 export function Grid() {
     const width = 360;
-    const height = 300;
+    const height = 360;
     const boxSize = 30;
 
     const boxes = [];

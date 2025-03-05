@@ -1,173 +1,125 @@
+import { useEffect, useState } from 'react';
+
 import { PageTimeData } from '@/types';
 
 const STORAGE_KEY = 'compound-alchemy-page-time-data';
-const activeTrackingSessions = new Map<string, { 
-  startTime: number, 
-  isNewVisit: boolean // Flag to track if this is a new visit or resuming
-}>();
+const activeTrackingSessions = new Map<string, { startTime: number }>();
 
-/**
- * Start tracking time spent on a page
- */
-export const startTracking = (pageId: string, isNewVisit = true): void => {
-  // Store the start time and visit type
-  activeTrackingSessions.set(pageId, {
-    startTime: Date.now(),
-    isNewVisit
-  });
-  
-  const pageData = getPageData(pageId);
-  const now = Date.now();
-  
-  if (!pageData) {
-    // First visit to this page
-    savePageData({
-      pageId,
-      totalTimeSpent: 0,
-      visits: 1,
-      lastVisitTimestamp: now,
-      firstVisitTimestamp: now
-    });
-  } else if (isNewVisit) {
-    // Only increment visit count for new visits, not when resuming after visibility change
-    savePageData({
-      ...pageData,
-      visits: pageData.visits + 1,
-      lastVisitTimestamp: now
-    });
-  }
-};
+export const usePageTimeTracker = (pageId: string) => {
+  const [pageData, setPageData] = useState<PageTimeData | null>(null);
 
-/**
- * Stop tracking time and update storage
- */
-export const stopTracking = (pageId: string): void => {
-  const session = activeTrackingSessions.get(pageId);
-  if (!session) return;
-  
-  const timeSpent = Date.now() - session.startTime;
-  
-  const pageData = getPageData(pageId);
-  if (pageData) {
-    savePageData({
-      ...pageData,
-      totalTimeSpent: pageData.totalTimeSpent + timeSpent
-    });
-  }
-  
-  activeTrackingSessions.delete(pageId);
-};
+  useEffect(() => {
+    const startTime = Date.now();
+    const now = Date.now();
 
-/**
- * Get all page tracking data
- */
-export const getAllPageData = (): Record<string, PageTimeData> => {
-  try {
-    const storedData = localStorage.getItem(STORAGE_KEY);
-    if (storedData) {
-      return JSON.parse(storedData);
+    const storedData = getPageData(pageId);
+    if (!storedData) {
+      const newPageData: PageTimeData = {
+        pageId,
+        totalTimeSpent: 0,
+        lastVisitTimestamp: now,
+        firstVisitTimestamp: now,
+      };
+      savePageData(newPageData);
+      setPageData(newPageData);
+    } else {
+      const updatedPageData = {
+        ...storedData,
+        lastVisitTimestamp: now,
+      };
+      savePageData(updatedPageData);
+      setPageData(updatedPageData);
     }
-  } catch (error) {
-    console.error('Error retrieving page time data:', error);
-  }
-  
-  return {};
-};
 
-/**
- * Get data for a specific page
- */
-export const getPageData = (pageId: string): PageTimeData | null => {
-  const allData = getAllPageData();
-  return allData[pageId] || null;
-};
+    activeTrackingSessions.set(pageId, { startTime });
 
-/**
- * Save page data to localStorage
- */
-const savePageData = (data: PageTimeData): void => {
-  try {
-    const allData = getAllPageData();
-    allData[data.pageId] = data;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
-  } catch (error) {
-    console.error('Error saving page time data:', error);
-  }
-};
-
-/**
- * Clear all tracking data
- */
-export const clearAllPageData = (): void => {
-  try {
-    localStorage.removeItem(STORAGE_KEY);
-  } catch (error) {
-    console.error('Error clearing page time data:', error);
-  }
-};
-
-/**
- * React hook for automatic page time tracking
- */
-export const usePageTimeTracking = (pageId: string): void => {
-  if (typeof window === 'undefined') return;
-  
-  // Effect setup function
-  const setupTracking = () => {
-    // Start tracking when component mounts (this is a new visit)
-    startTracking(pageId, true);
-    
-    // Setup tracking for visibility changes
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         stopTracking(pageId);
       } else {
-        // Resume tracking, but don't count as a new visit
-        startTracking(pageId, false);
+        startTracking(pageId);
       }
     };
-    
-    // Setup beforeunload to catch when user leaves the page
+
     const handleBeforeUnload = () => {
       stopTracking(pageId);
+      sendTimeDataToAPI();
     };
-    
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('beforeunload', handleBeforeUnload);
-    
-    // Cleanup function
+
     return () => {
       stopTracking(pageId);
+      sendTimeDataToAPI();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  };
-  
-  // Use React's useEffect
-  if (typeof React !== 'undefined' && React.useEffect) {
-    React.useEffect(setupTracking, [pageId]);
-  } else {
-    // Basic setup if not in React context
-    const cleanup = setupTracking();
-    
-    // Return cleanup function
-    return cleanup;
-  }
-};
+  }, [pageId]);
 
-/**
- * Format milliseconds as human-readable time
- */
-export const formatTimeSpent = (milliseconds: number): string => {
-  const seconds = Math.floor(milliseconds / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  
-  if (hours > 0) {
-    return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
-  } else if (minutes > 0) {
-    return `${minutes}m ${seconds % 60}s`;
-  } else {
-    return `${seconds}s`;
-  }
+  const startTracking = (pageId: string) => {
+    const now = Date.now();
+    activeTrackingSessions.set(pageId, { startTime: now });
+  };
+
+  const stopTracking = (pageId: string) => {
+    const session = activeTrackingSessions.get(pageId);
+    if (!session) return;
+
+    const timeSpent = Date.now() - session.startTime;
+    const storedData = getPageData(pageId);
+    if (storedData) {
+      const updatedPageData = {
+        ...storedData,
+        totalTimeSpent: storedData.totalTimeSpent + timeSpent,
+        lastVisitTimestamp: Date.now(),
+      };
+      savePageData(updatedPageData);
+      setPageData(updatedPageData);
+    }
+    activeTrackingSessions.delete(pageId);
+  };
+
+  const getPageData = (pageId: string): PageTimeData | null => {
+    try {
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        const allData = JSON.parse(storedData);
+        return allData[pageId] || null;
+      }
+    } catch (error) {
+      console.error('Error retrieving page time data:', error);
+    }
+    return null;
+  };
+
+  const savePageData = (data: PageTimeData): void => {
+    try {
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      const allData = storedData ? JSON.parse(storedData) : {};
+      allData[data.pageId] = data;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(allData));
+    } catch (error) {
+      console.error('Error saving page time data:', error);
+    }
+  };
+
+  const sendTimeDataToAPI = async () => {
+    try {
+      const storedData = localStorage.getItem(STORAGE_KEY);
+      if (storedData) {
+        const response = await fetch('/api/user/time', {
+          method: 'POST',
+          body: JSON.stringify({ time: JSON.parse(storedData) }),
+        });
+        if (!response.ok) {
+          throw new Error('Failed to send time data to API');
+        }
+      }
+    } catch (error) {
+      console.error('Error sending time data to API:', error);
+    }
+  };
+
+  return pageData;
 };

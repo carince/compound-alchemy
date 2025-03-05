@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo, useCallback, Dispatch, SetStateAction } from "react";
-import { Stage, Layer, Circle, Line, Text, Group } from "react-konva";
-import { AtomData, MoleculeWithNames, ValidationMessage } from "@/types";
-import { getElementName, getValenceElectrons, isMetal } from "@/utils/elements";
+import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Circle, Group, Layer, Line, Stage, Text } from "react-konva";
+
 import { Grid } from "@/components/Canvas/Grid";
+import { AtomData, Molecule, ValidationMessage } from "@/types";
+import { getValenceElectrons, isMetal } from "@/utils/elements";
 
 // Constants for styling and layout
 const STYLES = {
@@ -18,18 +19,18 @@ const STYLES = {
     hitboxSize: 30
   },
   bracket: {
-    size: 50,
+    size: 45,
     strokeWidth: 2,
     donorColor: "#FF6B6B",   // Red for cations
     acceptorColor: "#4ECDC4", // Teal for anions
     neutralColor: "transparent"
   },
-  text: { fontSize: 20, fontFamily: "Arial", width: 40, height: 40 },
+  text: { fontSize: 20, fontFamily: "Arial, monospace", width: 40, height: 40 },
   positions: {
-    top: { x: 0, y: -40 },
-    bottom: { x: 0, y: 40 },
-    right: { x: 40, y: 0 },
-    left: { x: -40, y: 0 }
+    top: { x: 0, y: -30 },
+    bottom: { x: 0, y: 30 },
+    right: { x: 30, y: 0 },
+    left: { x: -30, y: 0 }
   }
 };
 
@@ -42,7 +43,7 @@ interface DraggingElectron {
 }
 
 export function IonicBuilder({ currentMolecule, setValidMolecules }: {
-  currentMolecule: MoleculeWithNames,
+  currentMolecule: Molecule,
   setValidMolecules: Dispatch<SetStateAction<{ [x: string]: boolean | undefined; }>>
 }) {
   const [atomsData, setAtomsData] = useState<Record<string, AtomData>>({});
@@ -115,16 +116,14 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
     setValidationMessages(messages);
     setValidMolecules(prev => ({
       ...prev,
-      [currentMolecule.name]: messages.length === 0
+      [currentMolecule.formula]: messages.length === 0
     }));
   }, [atomsData, currentMolecule, getAtomData, getIdealElectronCount, setValidMolecules]);
 
-  // Run validation when atom data changes
+  // Validate structure on load
   useEffect(() => {
-    if (Object.keys(atomsData).length > 0) {
-      validateStructure();
-    }
-  }, [atomsData, validateStructure]);
+    validateStructure();
+  }, [atomsData]);
 
   // Event handlers for electron dragging
   const handleDragStart = useCallback((atomId: string, side: "top" | "right" | "bottom" | "left", sideIndex: number, electronIndex: number) => {
@@ -165,7 +164,12 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
           sourceAtomData.electrons--;
         }
 
-        targetAtomData.electrons = (targetAtomData.electrons || 0) + 1;
+        if (targetAtomData.electrons < 8) {
+          targetAtomData.electrons = (targetAtomData.electrons || 0) + 1;
+        } else {
+          // Return the electron to the source if the target already has 8 electrons
+          sourceAtomData.electrons++;
+        }
 
         return {
           ...prev,
@@ -237,11 +241,11 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
           {/* Charge indicator - only show when there's a charge */}
           {(isDonor || isAcceptor) && (
             <Text
-              x={atom.position.x + STYLES.bracket.size - 5}
-              y={atom.position.y - STYLES.bracket.size - 15}
+              x={atom.position.x + STYLES.bracket.size - 25}
+              y={atom.position.y - STYLES.bracket.size + 5}
               text={isDonor ? `+${originalValence - electrons}` : `-${electrons - originalValence}`}
               fontSize={16}
-              fontFamily={STYLES.text.fontFamily}
+              fontFamily="Courier New"
               fill={bracketColor}
               fontStyle="bold"
             />
@@ -348,13 +352,13 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
   ), [currentMolecule.atoms, getAtomData, getIdealElectronCount]);
 
   return (
-    <div className="bg-base-200 flex flex-col md:flex-row gap-5 w-min items-center justify-center rounded-lg shadow-lg border border-zinc-800">
+    <div className="bg-base-300 flex flex-col md:flex-row gap-3 md:p-3 w-min items-center justify-center rounded-lg shadow-lg">
       {/* Playground */}
       <div className="Playground">
         <Stage
           ref={stageRef}
           width={360}
-          height={300}
+          height={360}
           className="bg-zinc-400 border border-zinc-800 rounded-xl overflow-hidden shadow-lg"
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
@@ -383,7 +387,7 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
 
 
       {/* Validation panel */}
-      <div className="p-5 h-full w-[20rem] min-w-xs">
+      <div className="pb-5 md:pb-0 h-full w-[20rem] min-w-xs">
         {/* Instructions */}
         <div className="my-3 p-2 bg-blue-100 border border-blue-300 rounded">
           <p className="text-sm text-blue-800">
@@ -413,27 +417,18 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
               <tr>
                 <th className="py-2 px-3 border border-zinc-600">Element</th>
                 <th className="py-2 px-3 border border-zinc-600">Charge</th>
-                <th className="py-2 px-3 border border-zinc-600">Status</th>
               </tr>
             </thead>
             <tbody>
               {atomStatusData.map(atom => (
                 <tr key={atom.id}>
                   <td className="py-2 px-3 text-center border border-zinc-600 font-medium">
-                    {atom.element}
+                    {atom.element} ({atom.id})
                   </td>
                   <td className={`py-2 px-3 text-center border border-zinc-600 
                     ${atom.charge > 0 ? 'text-red-600 font-bold' :
                       atom.charge < 0 ? 'text-blue-600 font-bold' : 'text-green-600 font-bold'}`}>
                     {atom.charge > 0 ? `+${atom.charge}` : atom.charge}
-                  </td>
-                  <td className={`py-2 px-3 text-center border border-zinc-600 
-                    ${atom.isStable ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                    {atom.isStable ?
-                      (atom.current === 0 ? 'Empty shell' : 'Full shell') :
-                      `Need ${atom.current < atom.idealElectrons ?
-                        atom.idealElectrons - atom.current + ' more' :
-                        atom.current - atom.idealElectrons + ' less'}`}
                   </td>
                 </tr>
               ))}
