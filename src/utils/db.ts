@@ -4,6 +4,7 @@ let cachedDb: Mongoose | null = null;
 
 export default async function dbConnect(): Promise<Mongoose> {
     const MONGODB_URI = process.env.MONGODB_URI;
+    const dbName = process.env.NODE_ENV
 
     if (!MONGODB_URI) {
         throw new Error('Please define the MONGODB_URI environment variable');
@@ -14,7 +15,7 @@ export default async function dbConnect(): Promise<Mongoose> {
     }
 
     if (!cachedDb) {
-        cachedDb = await connect(MONGODB_URI, { bufferCommands: false, dbName: 'dev' })
+        cachedDb = await connect(MONGODB_URI, { bufferCommands: false, dbName })
     }
 
     return cachedDb;
