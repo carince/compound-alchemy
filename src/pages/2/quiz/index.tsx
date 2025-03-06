@@ -8,8 +8,6 @@ import User from "@/components/User";
 import { UserDataType } from "@/types";
 import { usePageTimeTracker } from "@/utils/pageTimeTracker";
 
-
-
 export type Option = {
     value: string;
     label: string;
@@ -190,16 +188,18 @@ export default function GamePage() {
 
     return (
         <div className="absolute w-full h-full flex flex-col bg-gradient-to-b from-base-100 to-base-200 text-white overflow-hidden">
-            <div className="Navbar fixed z-10 top-0 h-min w-full bg-base-200/80 backdrop-blur-sm flex flex-row justify-between p-2 px-3 sm:px-5 md:p-5 gap-3 overflow-hidden shadow-md">
-                <Branding className="flex items-center sm:pt-3 md:pt-0" classNameLogo="w-10 sm:w-12" classNameText="hidden md:flex flex-col text-xl" />
+            <div
+                className="Navbar fixed z-10 top-0 h-min w-full bg-base-200/90 backdrop-blur-sm flex flex-row justify-between p-2 px-3 md:p-4 gap-3 overflow-hidden shadow-sm"
+            >
+                <Branding className="flex items-center" classNameLogo="w-8 md:w-10" classNameText="hidden md:flex flex-col text-lg" />
 
-                <div className="flex items-center gap-2">
-                    <User pictureCn="block w-8 sm:w-9" className="bg-base-300/70 px-3 sm:px-4 rounded-lg gap-3 sm:gap-5 hover:bg-base-300 transition-colors" textCn="text-xs sm:text-sm md:text-md" withLogout={true} />
+                <div className="flex items-center">
+                    <User pictureCn="block w-7 md:w-8" className="px-2 sm:px-3 rounded-lg gap-2 sm:gap-3 hover:bg-base-300/50 transition-colors" textCn="text-xs md:text-sm" withLogout={true} />
                 </div>
             </div>
 
             <div className="h-screen overflow-scroll flex flex-col mt-14 sm:mt-16 md:mt-28 p-3 sm:p-5 md:p-8 text-sm max-w-4xl mx-auto w-full">
-                <h1 className="text-2xl mb-4">Checking of Understanding #1</h1>
+                <h1 className="text-2xl mb-4">Quiz: Ionic Compounds</h1>
                 <form onSubmit={handleSubmit} className="Content flex flex-col w-full items-center justify-center gap-5 p-5">
                     {questions.map((question, index) => (
                         <div key={index} className="Question p-5 bg-base-200 rounded shadow-lg sm:w-3/4">

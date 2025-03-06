@@ -3,7 +3,6 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react";
 import { Circle, Group, Layer, Line, Stage, Text } from "react-konva";
 
-import { Grid } from "@/components/Canvas/Grid";
 import { AtomData, BondData, Molecule, ValidationMessage } from "@/types";
 import { getElementName, getValenceElectrons } from "@/utils/elements";
 
@@ -19,6 +18,59 @@ const STYLES = {
         right: { x: 30, y: 0 },
         left: { x: -30, y: 0 }
     }
+};
+
+// Helper function to determine max bond order between two elements
+const getMaxBondOrder = (element1: string, element2: string): number => {
+    // Remove any numbers from element symbols
+    const cleanElement1 = element1.replace(/[0-9]/g, "");
+    const cleanElement2 = element2.replace(/[0-9]/g, "");
+
+    // Common groups
+    const group1 = ['H', 'Li', 'Na', 'K', 'Rb', 'Cs', 'Fr'];
+    const group2 = ['Be', 'Mg', 'Ca', 'Sr', 'Ba', 'Ra'];
+    const group17 = ['F', 'Cl', 'Br', 'I', 'At'];
+    const group16 = ['O', 'S', 'Se', 'Te', 'Po'];
+    const group15 = ['N', 'P', 'As', 'Sb', 'Bi'];
+    const group14 = ['C', 'Si', 'Ge', 'Sn', 'Pb'];
+    const transitionMetals = ['Sc', 'Ti', 'V', 'Cr', 'Mn', 'Fe', 'Co', 'Ni', 'Cu', 'Zn',
+        'Y', 'Zr', 'Nb', 'Mo', 'Tc', 'Ru', 'Rh', 'Pd', 'Ag', 'Cd',
+        'Hf', 'Ta', 'W', 'Re', 'Os', 'Ir', 'Pt', 'Au', 'Hg'];
+
+    // Carbon can form triple bonds with C, N; double bonds with O; single bonds with many elements
+    if (cleanElement1 === 'C' && cleanElement2 === 'C') return 3;
+    if ((cleanElement1 === 'C' && cleanElement2 === 'N') ||
+        (cleanElement1 === 'N' && cleanElement2 === 'C')) return 3;
+    if ((cleanElement1 === 'C' && cleanElement2 === 'O') ||
+        (cleanElement1 === 'O' && cleanElement2 === 'C')) return 2;
+
+    // Nitrogen can form triple bonds with C, N; double bonds with O
+    if (cleanElement1 === 'N' && cleanElement2 === 'N') return 3;
+    if ((cleanElement1 === 'N' && cleanElement2 === 'O') ||
+        (cleanElement1 === 'O' && cleanElement2 === 'N')) return 2;
+
+    // Oxygen typically forms at most double bonds
+    if (cleanElement1 === 'O' && cleanElement2 === 'O') return 1; // O2 is special case with resonance
+
+    // Group 17 (halogens) typically form single bonds
+    if (group17.includes(cleanElement1) || group17.includes(cleanElement2)) return 1;
+
+    // Group 1 (alkali metals) typically form single bonds
+    if (group1.includes(cleanElement1) || group1.includes(cleanElement2)) return 1;
+
+    // Group 2 (alkaline earth metals) typically form single bonds
+    if (group2.includes(cleanElement1) || group2.includes(cleanElement2)) return 1;
+
+    // P, S and other heavier elements have more complex bonding patterns
+    if (cleanElement1 === 'P' || cleanElement2 === 'P') return 1; // P typically forms single bonds with many elements
+    if (cleanElement1 === 'S' || cleanElement2 === 'S') {
+        // S can form double bonds with O, but mostly single bonds with others
+        if (cleanElement1 === 'O' || cleanElement2 === 'O') return 2;
+        return 1;
+    }
+
+    // Default to single bond if no specific rule is defined
+    return 1;
 };
 
 export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
@@ -79,7 +131,23 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
             atom.bonds.forEach(connectedId => {
                 const bondKey = [atom.id, connectedId].sort().join("-");
                 const bondData = getBondData(bondKey);
-                bondOrdersSum += bondData.type === "single" ? 1 : bondData.type === "double" ? 2 : 3;
+
+                // Get connected atom
+                const connectedAtom = currentMolecule.atoms.find(a => a.id === connectedId)!;
+
+                // Check if bond order is valid between these elements
+                const maxBondOrder = getMaxBondOrder(atom.element, connectedAtom.element);
+                const currentBondOrder = bondData.type === "single" ? 1 : bondData.type === "double" ? 2 : 3;
+
+                if (currentBondOrder > maxBondOrder) {
+                    messages.push({
+                        type: "error",
+                        atomId: atom.id,
+                        message: `${atom.element} cannot form a ${bondData.type} bond with ${connectedAtom.element}. Maximum is ${maxBondOrder === 1 ? 'single' : maxBondOrder === 2 ? 'double' : 'triple'}.`
+                    });
+                }
+
+                bondOrdersSum += currentBondOrder;
             });
 
             const totalValence = loneElectrons + bondOrdersSum;
@@ -129,6 +197,27 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
         const bondData = getBondData(bondKey);
         const { type } = bondData;
 
+        // Calculate bond direction vector
+        const dx = toAtom.position.x - fromAtom.position.x;
+        const dy = toAtom.position.y - fromAtom.position.y;
+
+        // Calculate bond angle and perpendicular offsets
+        const angle = Math.atan2(dy, dx);
+        const perpAngle = angle + Math.PI / 2;
+
+        // Calculate offset vectors perpendicular to the bond
+        const getOffsetPoints = (spacing: number) => {
+            const offsetX = spacing * Math.cos(perpAngle);
+            const offsetY = spacing * Math.sin(perpAngle);
+
+            return {
+                fromX: fromAtom.position.x + offsetX,
+                fromY: fromAtom.position.y + offsetY,
+                toX: toAtom.position.x + offsetX,
+                toY: toAtom.position.y + offsetY
+            };
+        };
+
         return (
             <Group
                 key={bondKey}
@@ -152,55 +241,63 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
                 )}
                 {type === "double" && (
                     <>
-                        <Line
-                            points={[
-                                fromAtom.position.x - STYLES.bond.spacing.double,
-                                fromAtom.position.y,
-                                toAtom.position.x - STYLES.bond.spacing.double,
-                                toAtom.position.y
-                            ]}
-                            stroke={STYLES.bond.color}
-                            strokeWidth={STYLES.bond.strokeWidth}
-                        />
-                        <Line
-                            points={[
-                                fromAtom.position.x + STYLES.bond.spacing.double,
-                                fromAtom.position.y,
-                                toAtom.position.x + STYLES.bond.spacing.double,
-                                toAtom.position.y
-                            ]}
-                            stroke={STYLES.bond.color}
-                            strokeWidth={STYLES.bond.strokeWidth}
-                        />
+                        {/* First line (negative offset) */}
+                        {(() => {
+                            const offset = getOffsetPoints(-STYLES.bond.spacing.double);
+                            return (
+                                <Line
+                                    points={[offset.fromX, offset.fromY, offset.toX, offset.toY]}
+                                    stroke={STYLES.bond.color}
+                                    strokeWidth={STYLES.bond.strokeWidth}
+                                />
+                            );
+                        })()}
+
+                        {/* Second line (positive offset) */}
+                        {(() => {
+                            const offset = getOffsetPoints(STYLES.bond.spacing.double);
+                            return (
+                                <Line
+                                    points={[offset.fromX, offset.fromY, offset.toX, offset.toY]}
+                                    stroke={STYLES.bond.color}
+                                    strokeWidth={STYLES.bond.strokeWidth}
+                                />
+                            );
+                        })()}
                     </>
                 )}
                 {type === "triple" && (
                     <>
-                        <Line
-                            points={[
-                                fromAtom.position.x - STYLES.bond.spacing.triple,
-                                fromAtom.position.y,
-                                toAtom.position.x - STYLES.bond.spacing.triple,
-                                toAtom.position.y
-                            ]}
-                            stroke={STYLES.bond.color}
-                            strokeWidth={STYLES.bond.strokeWidth}
-                        />
+                        {/* First line (negative offset) */}
+                        {(() => {
+                            const offset = getOffsetPoints(-STYLES.bond.spacing.triple);
+                            return (
+                                <Line
+                                    points={[offset.fromX, offset.fromY, offset.toX, offset.toY]}
+                                    stroke={STYLES.bond.color}
+                                    strokeWidth={STYLES.bond.strokeWidth}
+                                />
+                            );
+                        })()}
+
+                        {/* Middle line (no offset) */}
                         <Line
                             points={[fromAtom.position.x, fromAtom.position.y, toAtom.position.x, toAtom.position.y]}
                             stroke={STYLES.bond.color}
                             strokeWidth={STYLES.bond.strokeWidth}
                         />
-                        <Line
-                            points={[
-                                fromAtom.position.x + STYLES.bond.spacing.triple,
-                                fromAtom.position.y,
-                                toAtom.position.x + STYLES.bond.spacing.triple,
-                                toAtom.position.y
-                            ]}
-                            stroke={STYLES.bond.color}
-                            strokeWidth={STYLES.bond.strokeWidth}
-                        />
+
+                        {/* Third line (positive offset) */}
+                        {(() => {
+                            const offset = getOffsetPoints(STYLES.bond.spacing.triple);
+                            return (
+                                <Line
+                                    points={[offset.fromX, offset.fromY, offset.toX, offset.toY]}
+                                    stroke={STYLES.bond.color}
+                                    strokeWidth={STYLES.bond.strokeWidth}
+                                />
+                            );
+                        })()}
                     </>
                 )}
             </Group>
@@ -327,9 +424,8 @@ export function CovalentBuilder({ currentMolecule, setValidMolecules }: {
                 <Stage
                     width={360}
                     height={360}
-                    className="bg-zinc-400 border border-zinc-800 rounded-xl overflow-hidden shadow-lg"
+                    className="bg-zinc-600 border border-zinc-800 rounded-xl overflow-hidden shadow-lg"
                 >
-                    <Grid />
                     <Layer>
                         {/* Render bonds */}
                         {currentMolecule.bonds.map(renderBond)}

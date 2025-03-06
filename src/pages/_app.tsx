@@ -30,7 +30,7 @@ export default function App({ Component, pageProps }: AppProps) {
       >
         <main className={`antialiased ${geistSans.className} ${geistMono.className} overflow-hidden`}>
           <Component {...pageProps} />
-          <Toaster richColors={true} theme="dark" />
+          <Toaster richColors={true} theme="dark" position="bottom-center" />
         </main>
       </motion.div>
     </AnimatePresence>

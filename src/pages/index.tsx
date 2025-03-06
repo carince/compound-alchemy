@@ -22,8 +22,6 @@ export default function Home() {
 
     const { currentLevel }: UserDataType = await request.json();
 
-    // if (process.env.NEXT_PUBLIC_NODE_ENV === 'development') return router.push('/game');
-
     if (currentLevel === 3) return router.push('/3');
     return router.push(`/${currentLevel}/lesson`);
   }

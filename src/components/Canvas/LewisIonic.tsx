@@ -3,7 +3,6 @@
 import { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Group, Layer, Line, Stage, Text } from "react-konva";
 
-import { Grid } from "@/components/Canvas/Grid";
 import { AtomData, Molecule, ValidationMessage } from "@/types";
 import { getValenceElectrons, isMetal } from "@/utils/elements";
 
@@ -359,13 +358,12 @@ export function IonicBuilder({ currentMolecule, setValidMolecules }: {
           ref={stageRef}
           width={360}
           height={360}
-          className="bg-zinc-400 border border-zinc-800 rounded-xl overflow-hidden shadow-lg"
+          className="bg-zinc-600 border border-zinc-800 rounded-xl overflow-hidden shadow-lg"
           onMouseMove={handleDragMove}
           onMouseUp={handleDragEnd}
           onTouchMove={handleDragMove}
           onTouchEnd={handleDragEnd}
         >
-          <Grid />
           <Layer>
             {renderAtoms}
 

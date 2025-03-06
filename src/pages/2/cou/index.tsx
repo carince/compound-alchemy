@@ -91,25 +91,25 @@ export const covalent: Molecule[] = [
             {
                 id: "N1",
                 element: "N",
-                position: calculatePosition(0, 0),
+                position: calculatePosition(0, -1),
                 bonds: ["H1", "H2", "H3"],
             },
             {
                 id: "H1",
                 element: "H",
-                position: calculatePosition(-3, -3),
+                position: calculatePosition(-3, -1),
                 bonds: ["N1"],
             },
             {
                 id: "H2",
                 element: "H",
-                position: calculatePosition(3, -3),
+                position: calculatePosition(3, -1),
                 bonds: ["N1"],
             },
             {
                 id: "H3",
                 element: "H",
-                position: calculatePosition(0, 3),
+                position: calculatePosition(0, 2),
                 bonds: ["N1"],
             },
         ],
@@ -125,25 +125,25 @@ export const covalent: Molecule[] = [
             {
                 id: "P1",
                 element: "P",
-                position: calculatePosition(0, 0),
+                position: calculatePosition(0, -1),
                 bonds: ["Cl1", "Cl2", "Cl3"],
             },
             {
                 id: "Cl1",
                 element: "Cl",
-                position: calculatePosition(-3, -3),
+                position: calculatePosition(-3, -1),
                 bonds: ["P1"],
             },
             {
                 id: "Cl2",
                 element: "Cl",
-                position: calculatePosition(3, -3),
+                position: calculatePosition(3, -1),
                 bonds: ["P1"],
             },
             {
                 id: "Cl3",
                 element: "Cl",
-                position: calculatePosition(0, 3),
+                position: calculatePosition(0, 2),
                 bonds: ["P1"],
             },
         ],
@@ -194,10 +194,7 @@ export default function GamePage() {
     };
 
     useEffect(() => {
-        const fetchUser = async () => {
-            await fetchData();
-        };
-        fetchUser();
+        fetchData();
     }, []);
 
     const handleQuizChange = (e: React.ChangeEvent<HTMLInputElement>, moleculeFormula: string) => {
@@ -212,17 +209,13 @@ export default function GamePage() {
             return acc;
         }, {} as { [key: string]: boolean | undefined });
 
-        // Set state for UI updates if needed
         setValidNames(valid);
-
-        // Return the validation results directly
         return valid;
     };
 
     const handleSubmit = async () => {
         setSubmitting(true);
 
-        // Get validation results directly
         const nameValidationResults = validateNames();
 
         const payload = {
@@ -231,8 +224,6 @@ export default function GamePage() {
                 naming: nameValidationResults
             }
         }
-
-        console.log("Submitting with validation results:", nameValidationResults);
 
         try {
             const request = await fetch('/api/user/level/2/cou', {
@@ -255,76 +246,84 @@ export default function GamePage() {
     };
 
     return (
-        <div className="absolute w-full h-full flex flex-col bg-gradient-to-b from-base-100 to-base-200 text-white overflow-hidden">
-            <div className="Navbar fixed z-10 top-0 h-min w-full bg-base-200/80 backdrop-blur-sm flex flex-row justify-between p-2 px-3 sm:px-5 md:p-5 gap-3 overflow-hidden shadow-md">
-                <Branding className="flex items-center sm:pt-3 md:pt-0" classNameLogo="w-10 sm:w-12" classNameText="hidden md:flex flex-col text-xl" />
+        <div className="min-h-screen bg-gradient-to-b from-base-100 to-base-200 text-white">
+            <div
+                className="Navbar fixed z-10 top-0 h-min w-full bg-base-200/90 backdrop-blur-sm flex flex-row justify-between p-2 px-3 md:p-4 gap-3 overflow-hidden shadow-sm"
+            >
+                <Branding className="flex items-center" classNameLogo="w-8 md:w-10" classNameText="hidden md:flex flex-col text-lg" />
 
-                <div className="flex items-center gap-2">
-                    <User pictureCn="block w-8 sm:w-9" className="bg-base-300/70 px-3 sm:px-4 rounded-lg gap-3 sm:gap-5 hover:bg-base-300 transition-colors" textCn="text-xs sm:text-sm md:text-md" withLogout={true} />
+                <div className="flex items-center">
+                    <User pictureCn="block w-7 md:w-8" className="px-2 sm:px-3 rounded-lg gap-2 sm:gap-3 hover:bg-base-300/50 transition-colors" textCn="text-xs md:text-sm" withLogout={true} />
                 </div>
             </div>
 
-            <div className="h-screen overflow-scroll flex flex-col mt-14 sm:mt-16 md:mt-28 p-3 sm:p-5 md:p-8 text-sm max-w-4xl mx-auto w-full">
-                <h1 className="text-2xl mb-4">Checking of Undestanding #2</h1>
-                <div className="flex flex-col justify-center gap-5 mb-4">
-                    {covalent.map((molecule, index) => (
-                        <CovalentBuilder key={index} setValidMolecules={setValidMolecules} currentMolecule={molecule} />
-                    ))}
+            <div className="container flex flex-col items-center mx-auto max-w-4xl mt-16 p-4 pb-20">
+                <h1 className="text-xl text-left font-bold my-6">Checking of Understanding: Covalent Compounds</h1>
 
-                    <div className="flex flex-col gap-4 mb-4">
+                <section className="mb-8">
+                    <h2 className="text-md font-semibold mb-4 border-b border-base-300 pb-2">I. Create the valid Lewis Structure for each covalent compound</h2>
+                    <div className="space-y-8">
+                        {covalent.map((molecule, index) => (
+                            <CovalentBuilder key={index} setValidMolecules={setValidMolecules} currentMolecule={molecule} />
+                        ))}
+                    </div>
+                </section>
+
+                <section className="mb-8">
+                    <h2 className="text-md font-semibold mb-4 border-b border-base-300 pb-2">II. Write the chemical names of the given compounds</h2>
+                    <div className="space-y-4">
                         {Object.keys(chemicalNames).map((formula, index) => (
-                            <div key={index} className="flex flex-col gap-2">
-                                <label className="text-md">
-                                    {formula.split(/(\d+)/).map((part, index) =>
-                                        /\d+/.test(part) ? <sub key={index}>{part}</sub> : part
+                            <div key={index} className="flex flex-col">
+                                <label className="mb-1 text-sm">
+                                    {formula.split(/(\d+)/).map((part, idx) =>
+                                        /\d+/.test(part) ? <sub key={idx}>{part}</sub> : part
                                     )}
                                 </label>
                                 <input
                                     type="text"
                                     value={nameAnswers[formula] || ""}
                                     onChange={(e) => handleQuizChange(e, formula)}
-                                    className="p-2 rounded bg-base-300"
+                                    className="p-2 rounded bg-base-300/50 border border-base-300 focus:outline-none focus:border-blue-500"
+                                    placeholder="Enter chemical name"
                                 />
                             </div>
                         ))}
                     </div>
+                </section>
 
+                <button
+                    onClick={() => setSubmitConfirmOpen(true)}
+                    disabled={submitting}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors disabled:opacity-50"
+                >
+                    {submitting ? "Submitting..." : "Submit"}
+                </button>
 
-                    <button
-                        onClick={() => setSubmitConfirmOpen(true)}
-                        className="w-min mt-4 bg-blue-500 text-white px-4 py-2 rounded"
-                        disabled={submitting}
-                    >
-                        {submitting ? "Submitting..." : "Submit"}
-                    </button>
-
-                    {confirmOpen && (
-                        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-                            <div className="bg-base-200 p-6 rounded shadow-lg">
-                                <p>Are you sure you want to submit your answer?</p>
-                                <div className="mt-4 flex justify-center gap-2">
-                                    <button
-                                        onClick={() => setSubmitConfirmOpen(false)}
-                                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Cancel
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            setSubmitConfirmOpen(false);
-                                            handleSubmit();
-                                        }}
-                                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                                    >
-                                        Submit
-                                    </button>
-                                </div>
+                {confirmOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
+                        <div className="bg-base-100 p-5 rounded-lg shadow-xl max-w-sm w-full">
+                            <h3 className="mb-4 font-medium">Confirm Submission</h3>
+                            <p className="text-sm text-gray-300 mb-4">Are you sure you want to submit your answers? You won't be able to make changes afterward.</p>
+                            <div className="flex justify-end gap-2">
+                                <button
+                                    onClick={() => setSubmitConfirmOpen(false)}
+                                    className="px-4 py-2 bg-base-300 hover:bg-base-400 rounded-md"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setSubmitConfirmOpen(false);
+                                        handleSubmit();
+                                    }}
+                                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md"
+                                >
+                                    Submit
+                                </button>
                             </div>
                         </div>
-                    )}
-                </div>
-
-                <div className="pb-6 sm:pb-0"></div> {/* Bottom padding for scroll area */}
+                    </div>
+                )}
             </div>
         </div>
     );

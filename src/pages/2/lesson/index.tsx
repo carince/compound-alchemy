@@ -119,256 +119,257 @@ export default function GamePage() {
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="h-screen w-screen max-w-4xl overflow-scroll flex flex-col mt-[56px] md:mt-[100px] p-4 md:p-5 text-sm"
+                    className="h-screen w-screen overflow-scroll flex justify-center mt-[56px] md:mt-[100px] "
                 >
-                    <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold text-blue-400">
-                        Writing Chemical Formula
-                    </motion.h2>
+                    <div className="w-full max-w-4xl flex flex-col p-4 md:p-5 text-sm">
+                        <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold text-blue-400">
+                            Writing Chemical Formula
+                        </motion.h2>
 
-                    <motion.div variants={itemVariants} className="mb-6">
-                        <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
-                            <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
-                            <span>EXAMPLE: Hydrogen + Oxygen (Dihydrogen monoxide)</span>
-                        </h3>
-                        <div className="bg-base-200/30 rounded-lg p-3 md:p-4 border border-base-300/30">
-                            <ol className="list-decimal list-inside space-y-2">
-                                <li>
-                                    <span className="font-medium">Write the symbols of the elements involved:</span>
-                                    <ul className="list-disc list-inside ml-4 mt-1 opacity-90">
-                                        <li>Hydrogen - H</li>
-                                        <li>Oxygen - O</li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <span className="font-medium">Use the prefixes to identify the subscripts:</span>
-                                    <ul className="list-disc list-inside ml-4 mt-1 opacity-90">
-                                        <li>Dihydrogen - 2</li>
-                                        <li>Monoxide - 1</li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <span className="font-medium">Write the elements together with their subscripts:</span>
-                                    <div className="mt-2 p-2 bg-base-300/20 rounded-lg inline-block">
-                                        <span className="font-mono">H₂O</span>
-                                    </div>
-                                    <p className="ml-4 mt-1 opacity-90">
-                                        (No need to write for the subscript if it is 1)
-                                    </p>
-                                </li>
-                            </ol>
-                        </div>
-                    </motion.div>
+                        <motion.div variants={itemVariants} className="mb-6">
+                            <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
+                                <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
+                                <span>EXAMPLE: Hydrogen + Oxygen (Dihydrogen monoxide)</span>
+                            </h3>
+                            <div className="bg-base-200/30 rounded-lg p-3 md:p-4 border border-base-300/30">
+                                <ol className="list-decimal list-inside space-y-2">
+                                    <li>
+                                        <span className="font-medium">Write the symbols of the elements involved:</span>
+                                        <ul className="list-disc list-inside ml-4 mt-1 opacity-90">
+                                            <li>Hydrogen - H</li>
+                                            <li>Oxygen - O</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <span className="font-medium">Use the prefixes to identify the subscripts:</span>
+                                        <ul className="list-disc list-inside ml-4 mt-1 opacity-90">
+                                            <li>Dihydrogen - 2</li>
+                                            <li>Monoxide - 1</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <span className="font-medium">Write the elements together with their subscripts:</span>
+                                        <div className="mt-2 p-2 bg-base-300/20 rounded-lg inline-block">
+                                            <span className="font-mono">H₂O</span>
+                                        </div>
+                                        <p className="ml-4 mt-1 opacity-90">
+                                            (No need to write for the subscript if it is 1)
+                                        </p>
+                                    </li>
+                                </ol>
+                            </div>
+                        </motion.div>
 
-                    <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-3 text-blue-400">
-                        Drawing Lewis Dot Structures of Covalent Compounds
-                    </motion.h2>
-
-                    <motion.div
-                        variants={itemVariants}
-                        className="border-l-2 border-blue-400 pl-3 py-2 bg-base-300/10 rounded-r-md mb-4"
-                    >
-                        <h3 className="text-sm font-semibold mb-1 sm:mb-2 flex items-center gap-2">
-                            <IoInformationCircleOutline className="text-blue-400 flex-shrink-0" />
-                            <span className="leading-tight">Sharing Electrons Between Non-metal Atoms</span>
-                        </h3>
-                        <p className="mb-2 text-sm opacity-90">
-                            Covalent compounds are made by two or more nonmetal atoms, sharing their valence electrons. Shared valence electrons between two nonmetal atoms is called a covalent bond.
-                        </p>
-                        <p className="text-sm opacity-90">
-                            As atoms share their electrons, this allows them to fill the outer shell or what we call the valence shell with its outermost energy.
-                        </p>
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="border-l-2 border-purple-400 pl-3 py-2 bg-base-300/10 rounded-r-md mb-4">
-                        <h3 className="text-sm font-semibold mb-1 sm:mb-2">Properties of Covalent Compounds:</h3>
-                        <ul className="text-sm list-disc list-inside sm:ml-6 mt-1 sm:mt-2 space-y-0.5 sm:space-y-1 opacity-90">
-                            <li>Exist in solids, liquids, and gases</li>
-                            <li>Not very hard/flexible</li>
-                            <li>Very low conductivity</li>
-                        </ul>
-                    </motion.div>
-
-                    <motion.div variants={itemVariants} className="mb-6">
-                        <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
-                            <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
-                            <span>EXAMPLE 1: Water (H2O)</span>
-                        </h3>
+                        <motion.h2 variants={itemVariants} className="text-xl sm:text-2xl font-bold mb-3 text-blue-400">
+                            Drawing Lewis Dot Structures of Covalent Compounds
+                        </motion.h2>
 
                         <motion.div
-                            className="bg-base-200/30 rounded-lg p-3 md:p-4 border border-base-300/30"
+                            variants={itemVariants}
+                            className="border-l-2 border-blue-400 pl-3 py-2 bg-base-300/10 rounded-r-md mb-4"
                         >
-                            <ol className="list-decimal list-inside space-y-3">
-                                <li>
-                                    <span className="text-base font-medium">Identify the group of the elements given in the periodic table:</span>
-                                    <ul className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
-                                        <li>Oxygen (O) - Group 16</li>
-                                        <li>Hydrogen (H) - Group 1</li>
-                                    </ul>
-                                    <Image src="/2/1-1.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-gray-600 rounded-lg shadow-lg w-full max-w-80 p-2 my-2 sm:my-3" />
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Count the number of valence electrons for each element:</span>
-                                    <ul className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
-                                        <li>Oxygen: 6 valence electrons (Group 16)</li>
-                                        <li>Hydrogen: 1 valence electron (Group 1)</li>
-                                        <li>Since there are 2 hydrogen atoms (subscript 2), multiply: 1 × 2 = 2 electrons</li>
-                                    </ul>
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Count the total number of valence electrons:</span>
-                                    <div className="mt-2 p-2 bg-base-300/20 rounded-md inline-block text-center">
-                                        <span className="font-mono">H<sub>2</sub>O = 6 + 1(2) = 8 valence electrons</span>
-                                    </div>
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Arrange the atoms to show specific connections.:</span>
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
-                                        <span className="text-sm">Because H atoms are almost always terminal, the arrangement within the molecule must be HOH</span>
-                                    </div>
-                                    <Image src="/2/1-2.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-gray-600 rounded-lg shadow-lg w-full max-w-80 p-2 my-2 sm:my-3" />
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Place a bonding pair of electrons between each pair of adjacent atoms to give a single bond:</span>
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
-                                        <span className="text-sm">Placing one bonding pair of electrons between the O atom and each H atom gives us:</span>
-                                    </div>
-                                    <Image src="/2/1-3.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-gray-600 rounded-lg shadow-lg w-full max-w-80 p-2 my-2 sm:my-3" />
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
-                                        <span className="text-sm">Leaving us with 4 electrons left over with each H atom a full valence shell of 2 electrons.</span>
-                                    </div>
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Distribute the remaining electrons as lone pairs on the terminal atoms (H), completing their octets:</span>
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
-                                        <span className="text-sm">Since H atoms only need 2 electrons, they already have a full valence shell.</span>
-                                    </div>
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Place all remaining electrons on the central atom (O):</span>
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
-                                        <span className="text-sm">The remaining 4 electrons will be placed as lone pairs on the O atom.</span>
-                                    </div>
-                                    <Image src="/2/1-4.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-gray-600 rounded-lg shadow-lg w-full max-w-80 p-2 my-2 sm:my-3" />
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Check if the central atom has an octet:</span>
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
-                                        <span className="text-sm">The O atom has 8 electrons around it, fulfilling the octet rule.</span>
-                                    </div>
-                                </li>
-                                <li className="pl-1 sm:pl-2">
-                                    <span className="text-base font-medium">Confirm the Lewis structure:</span>
-                                    <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
-                                        <span className="text-sm">The final Lewis structure for H<sub>2</sub>O is:</span>
-                                    </div>
-                                    <Image src="/2/1-4.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-gray-600 rounded-lg shadow-lg w-full max-w-80 p-2 my-2 sm:my-3" />
-                                </li>
-                            </ol>
+                            <h3 className="text-sm font-semibold mb-1 sm:mb-2 flex items-center gap-2">
+                                <IoInformationCircleOutline className="text-blue-400 flex-shrink-0" />
+                                <span className="leading-tight">Sharing Electrons Between Non-metal Atoms</span>
+                            </h3>
+                            <p className="mb-2 text-sm opacity-90">
+                                Covalent compounds are made by two or more nonmetal atoms, sharing their valence electrons. Shared valence electrons between two nonmetal atoms is called a covalent bond.
+                            </p>
+                            <p className="text-sm opacity-90">
+                                As atoms share their electrons, this allows them to fill the outer shell or what we call the valence shell with its outermost energy.
+                            </p>
                         </motion.div>
-                    </motion.div>
 
-                    <motion.div
-                        variants={itemVariants}
-                        className="bg-base-200/30 rounded-lg p-3 md:p-4 border border-base-300/30 flex flex-col justify-center"
-                    >
-                        <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
-                            <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
-                            <span>Practice: Draw the Lewis Structure</span>
-                        </h3>
-                        <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="bg-primary hover:bg-primary/90 transition-colors p-2 rounded-md text-white"
-                            onClick={() => setIonicBuilderOpen(true)}
+                        <motion.div variants={itemVariants} className="border-l-2 border-purple-400 pl-3 py-2 bg-base-300/10 rounded-r-md mb-4">
+                            <h3 className="text-sm font-semibold mb-1 sm:mb-2">Properties of Covalent Compounds:</h3>
+                            <ul className="text-sm list-disc list-inside sm:ml-6 mt-1 sm:mt-2 space-y-0.5 sm:space-y-1 opacity-90">
+                                <li>Exist in solids, liquids, and gases</li>
+                                <li>Not very hard/flexible</li>
+                                <li>Very low conductivity</li>
+                            </ul>
+                        </motion.div>
+
+                        <motion.div variants={itemVariants} className="mb-6">
+                            <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
+                                <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
+                                <span>EXAMPLE: Water (H2O)</span>
+                            </h3>
+
+                            <motion.div
+                                className="bg-base-200/30 rounded-lg p-3 md:p-4 border border-base-300/30"
+                            >
+                                <ol className="list-decimal list-inside space-y-3">
+                                    <li>
+                                        <span className="text-base font-medium">Identify the group of the elements given in the periodic table:</span>
+                                        <ul className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
+                                            <li>Oxygen (O) - Group 16</li>
+                                            <li>Hydrogen (H) - Group 1</li>
+                                        </ul>
+                                        <Image src="/2/1-1.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-base-300 rounded-md w-full max-w-60 p-1 my-2" />
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Count the number of valence electrons for each element:</span>
+                                        <ul className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
+                                            <li>Oxygen: 6 valence electrons (Group 16)</li>
+                                            <li>Hydrogen: 1 valence electron (Group 1)</li>
+                                            <li>Since there are 2 hydrogen atoms (subscript 2), multiply: 1 × 2 = 2 electrons</li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Count the total number of valence electrons:</span>
+                                        <div className="mt-2 p-2 bg-base-300/20 rounded-md inline-block text-center">
+                                            <span className="font-mono">H<sub>2</sub>O = 6 + 1(2) = 8 valence electrons</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Arrange the atoms to show specific connections.:</span>
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
+                                            <span className="text-sm">Because H atoms are almost always terminal, the arrangement within the molecule must be HOH</span>
+                                        </div>
+                                        <Image src="/2/1-2.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-base-300 rounded-md w-full max-w-60 p-1 my-2" />
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Place a bonding pair of electrons between each pair of adjacent atoms to give a single bond:</span>
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm">
+                                            <span className="text-sm">Placing one bonding pair of electrons between the O atom and each H atom gives us:</span>
+                                        </div>
+                                        <Image src="/2/1-3.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-base-300 rounded-md w-full max-w-60 p-1 my-2" />
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
+                                            <span className="text-sm">Leaving us with 4 electrons left over with each H atom a full valence shell of 2 electrons.</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Distribute the remaining electrons as lone pairs on the terminal atoms (H), completing their octets:</span>
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
+                                            <span className="text-sm">Since H atoms only need 2 electrons, they already have a full valence shell.</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Place all remaining electrons on the central atom (O):</span>
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
+                                            <span className="text-sm">The remaining 4 electrons will be placed as lone pairs on the O atom.</span>
+                                        </div>
+                                        <Image src="/2/1-4.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-base-300 rounded-md w-full max-w-60 p-1 my-2" />
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Check if the central atom has an octet:</span>
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
+                                            <span className="text-sm">The O atom has 8 electrons around it, fulfilling the octet rule.</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <span className="text-base font-medium">Confirm the Lewis structure:</span>
+                                        <div className="list-disc list-inside ml-4 mt-1 opacity-90 text-sm ">
+                                            <span className="text-sm">The final Lewis structure for H<sub>2</sub>O is:</span>
+                                        </div>
+                                        <Image src="/2/1-4.png" width={800} height={800} alt="Sodium and Chlorine" className="border border-base-300 rounded-md w-full max-w-60 p-1 my-2" />
+                                    </li>
+                                </ol>
+                            </motion.div>
+                        </motion.div>
+
+                        <motion.div
+                            variants={itemVariants}
+                            className="bg-base-200/30 rounded-lg p-3 md:p-4 border border-base-300/30 flex flex-col justify-center"
                         >
-                            Open Ionic Builder
-                        </motion.button>
-                        <AnimatePresence>
-                            {ionicBuilderOpen && (
-                                <motion.div
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    className="fixed h-screen inset-0 z-50 flex justify-center items-center bg-black bg-opacity-70 py-10 overflow-scroll"
-                                >
+                            <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
+                                <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
+                                <span>Practice: Validate the Lewis Structure</span>
+                            </h3>
+                            <motion.button
+                                whileTap={{ scale: 0.98 }}
+                                className="bg-blue-600 hover:bg-blue-600/90 transition-colors p-2 rounded-md text-white"
+                                onClick={() => setIonicBuilderOpen(true)}
+                            >
+                                Open Covalent Builder
+                            </motion.button>
+                            <AnimatePresence>
+                                {ionicBuilderOpen && (
                                     <motion.div
-                                        initial={{ scale: 0.9, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        exit={{ scale: 0.9, opacity: 0 }}
-                                        className="bg-base-200 flex flex-col h-min rounded-lg w-min"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="fixed h-screen inset-0 z-50 flex justify-center items-center bg-black bg-opacity-70 py-10 overflow-scroll"
                                     >
-                                        <CovalentBuilder
-                                            setValidMolecules={setValidMolecules}
-                                            currentMolecule={covalent.O2}
-                                        />
-                                        <motion.button
-                                            whileHover={{ scale: 1.03 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="bg-primary hover:bg-primary/90 transition-colors p-2 m-3 rounded-md"
-                                            onClick={() => setIonicBuilderOpen(false)}
+                                        <motion.div
+                                            initial={{ scale: 0.9, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            exit={{ scale: 0.9, opacity: 0 }}
+                                            className="bg-base-200 flex flex-col h-min rounded-lg w-min"
                                         >
-                                            Close
-                                        </motion.button>
+                                            <CovalentBuilder
+                                                setValidMolecules={setValidMolecules}
+                                                currentMolecule={covalent.O2}
+                                            />
+                                            <motion.button
+
+                                                whileTap={{ scale: 0.98 }}
+                                                className="bg-blue-600 hover:bg-blue-600/90 transition-colors p-2 m-3 rounded-md"
+                                                onClick={() => setIonicBuilderOpen(false)}
+                                            >
+                                                Close
+                                            </motion.button>
+                                        </motion.div>
                                     </motion.div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
 
-                    <motion.div variants={itemVariants}>
-                        <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md overflow-hidden">
-                            <IoInformationCircleOutline className="text-blue-400 text-xl flex-shrink-0" />
-                            <span>Progress Path</span>
-                        </h3>
-                        <div className="bg-base-200/30 rounded-lg border border-base-300/30">
-                            <div className="flex flex-col divide-y divide-base-300/30">
-                                <motion.button
-                                    whileHover={{
-                                        backgroundColor: canProceedToCOU ? "rgba(59, 130, 246, 0.1)" : undefined
-                                    }}
-                                    className={`p-3 flex justify-between items-center ${cou_completed ? "text-green-400" : ""
-                                        }`}
-                                    onClick={() => handleNavigate("/1/cou", canProceedToCOU)}
-                                    disabled={!canProceedToCOU && !cou_completed}
-                                >
-                                    <span className="font-medium">Checking of Understanding</span>
-                                    <span className="text-xs opacity-80">
-                                        {cou_completed ? "✓ Completed" : "Check your understanding of Covalent Bonding!"}
-                                    </span>
-                                </motion.button>
+                        <motion.div variants={itemVariants}>
+                            <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md overflow-hidden">
+                                <IoInformationCircleOutline className="text-blue-400 text-xl flex-shrink-0" />
+                                <span>Progress Path</span>
+                            </h3>
+                            <div className="bg-base-200/30 rounded-lg border border-base-300/30">
+                                <div className="flex flex-col divide-y divide-base-300/30">
+                                    <motion.button
+                                        whileHover={{
+                                            backgroundColor: canProceedToCOU ? "rgba(59, 130, 246, 0.1)" : undefined
+                                        }}
+                                        className={`p-3 flex justify-between items-center ${cou_completed ? "text-green-400" : ""
+                                            }`}
+                                        onClick={() => handleNavigate("/1/cou", canProceedToCOU)}
+                                        disabled={!canProceedToCOU && !cou_completed}
+                                    >
+                                        <span className="font-medium">Checking of Understanding</span>
+                                        <span className="text-xs opacity-80">
+                                            {cou_completed ? "✓ Completed" : "Check your understanding of Covalent Bonding!"}
+                                        </span>
+                                    </motion.button>
 
-                                <motion.button
-                                    whileHover={{
-                                        backgroundColor: canProceedToQuiz ? "rgba(59, 130, 246, 0.1)" : undefined
-                                    }}
-                                    className={`p-3 flex justify-between items-center ${quiz_completed ? "text-green-400" : ""
-                                        }`}
-                                    onClick={() => handleNavigate("/1/quiz", canProceedToQuiz)}
-                                    disabled={!canProceedToQuiz && !quiz_completed}
-                                >
-                                    <span className="font-medium">Quiz</span>
-                                    <span className="text-xs opacity-80">
-                                        {quiz_completed ? "✓ Completed" :
-                                            cou_completed ? "Available" : "Complete COU first"}
-                                    </span>
-                                </motion.button>
+                                    <motion.button
+                                        whileHover={{
+                                            backgroundColor: canProceedToQuiz ? "rgba(59, 130, 246, 0.1)" : undefined
+                                        }}
+                                        className={`p-3 flex justify-between items-center ${quiz_completed ? "text-green-400" : "bg-red-600/20"
+                                            }`}
+                                        onClick={() => handleNavigate("/1/quiz", canProceedToQuiz)}
+                                        disabled={!canProceedToQuiz && !quiz_completed}
+                                    >
+                                        <span className="font-medium">Quiz</span>
+                                        <span className="text-xs opacity-80">
+                                            {quiz_completed ? "✓ Completed" :
+                                                cou_completed ? "Available" : "Complete COU first"}
+                                        </span>
+                                    </motion.button>
 
-                                <motion.button
-                                    whileHover={{
-                                        backgroundColor: canProceedToNextLevel ? "rgba(59, 130, 246, 0.1)" : undefined
-                                    }}
-                                    className="p-3 flex justify-between items-center"
-                                    onClick={() => handleNavigate("/2/lesson", canProceedToNextLevel)}
-                                    disabled={!canProceedToNextLevel}
-                                >
-                                    <span className="font-medium">Compound Alchemy!</span>
-                                    <span className="text-xs opacity-80">
-                                        {canProceedToNextLevel ? "Available" : "Complete Quiz first"}
-                                    </span>
-                                </motion.button>
+                                    <motion.button
+                                        whileHover={{
+                                            backgroundColor: canProceedToNextLevel ? "rgba(59, 130, 246, 0.1)" : undefined
+                                        }}
+                                        className="p-3 flex justify-between items-center disabled:bg-red-600/20"
+                                        onClick={() => handleNavigate("/2/lesson", canProceedToNextLevel)}
+                                        disabled={!canProceedToNextLevel}
+                                    >
+                                        <span className="font-medium">Compound Alchemy!</span>
+                                        <span className="text-xs opacity-80">
+                                            {canProceedToNextLevel ? "Available" : "Complete Quiz first"}
+                                        </span>
+                                    </motion.button>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </div>
 
                     <div className="pb-6"></div> {/* Bottom padding for scroll area */}
                 </motion.div>
