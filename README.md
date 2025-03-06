@@ -1,5 +1,5 @@
 <div align="center" style="font-size: 3rem;">
-  <img src="https://github.com/carince/compound-alchemy/blob/next-page/public/logo.png?raw=true" alt="Logo" style="width: 6rem; aspect-ratio: 1 / 1;" />
+  <img src="https://github.com/carince/compound-alchemy/blob/main/public/logo.png?raw=true" alt="Logo" style="width: 6rem; aspect-ratio: 1 / 1;" />
   
   <h1 style="border-bottom: none;">Compound Alchemy</h1>
 </div>
@@ -10,9 +10,10 @@ Compound Alchemy is a web application designed for a school research project. It
 
 ## Features ✨
 
+- ⚛️ Ionic and Covalent Lewis Dot Structure Creator
 - ⚛️ Interactive compound creation inspired by Little Alchemy
 - 📚 Educational content on ionic and covalent bonding
-- 🔑 Credential authentication using Auth0
+- 🔑 Credential authentication
 - 💾 Saving user data using MongoDB
 
 ## Built With 🛠️
