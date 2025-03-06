@@ -20,6 +20,8 @@ html {
 *::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
+  border: 2px solid transparent; /* Add this line to remove the white box */
+  background-clip: content-box; /* Add this line to remove the white box */
 }
 
 /* Spinner */

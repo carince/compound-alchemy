@@ -77,7 +77,6 @@ export default function GamePage() {
         }
     };
 
-    const nacl_completed = validMolecules.NaCl === true;
     const cou_completed = userData?.progress.level1.cou.completed;
     const quiz_completed = userData?.progress.level1.quiz.completed;
     
@@ -235,7 +234,7 @@ export default function GamePage() {
                         >
                             <h3 className="text-lg font-medium mb-3 flex items-center gap-2 bg-base-300/20 p-2 rounded-md">
                                 <IoBulbOutline className="text-yellow-400 text-xl flex-shrink-0" />
-                                <span>Practice: Draw the Lewis Structure</span>
+                                <span>Practice Lewis Structure</span>
                             </h3>
                             <motion.button
                                 whileHover={{ scale: 1.03 }}
@@ -297,8 +296,7 @@ export default function GamePage() {
                                 >
                                     <span className="font-medium">Checking of Understanding</span>
                                     <span className="text-xs opacity-80">
-                                        {cou_completed ? "✓ Completed" : 
-                                         validMolecules.NaCl && "Available"}
+                                        {cou_completed ? "✓ Completed" : "Check your understanding of Ionic Bonding!"}
                                     </span>
                                 </motion.button>
                                 
