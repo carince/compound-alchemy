@@ -303,8 +303,7 @@ export default function GamePage() {
                                         whileHover={{
                                             backgroundColor: canProceedToQuiz ? "rgba(59, 130, 246, 0.1)" : undefined
                                         }}
-                                        className={`p-3 flex justify-between items-center ${quiz_completed ? "text-green-400" : "bg-red-600/20"
-                                            }`}
+                                        className={`p-3 flex justify-between items-center disabled:bg-red-600/20 ${quiz_completed && "text-green-400"}`}
                                         onClick={() => handleNavigate("/1/quiz", canProceedToQuiz)}
                                         disabled={!canProceedToQuiz && !quiz_completed}
                                     >

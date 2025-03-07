@@ -50,7 +50,7 @@ const getMaxBondOrder = (element1: string, element2: string): number => {
         (cleanElement1 === 'O' && cleanElement2 === 'N')) return 2;
 
     // Oxygen typically forms at most double bonds
-    if (cleanElement1 === 'O' && cleanElement2 === 'O') return 1; // O2 is special case with resonance
+    if (cleanElement1 === 'O' && cleanElement2 === 'O') return 2; // O2 is special case with resonance
 
     // Group 17 (halogens) typically form single bonds
     if (group17.includes(cleanElement1) || group17.includes(cleanElement2)) return 1;

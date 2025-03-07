@@ -199,7 +199,7 @@ export default function GamePage() {
             </div>
 
             <div className="h-screen overflow-scroll flex flex-col mt-14 sm:mt-16 md:mt-28 p-3 sm:p-5 md:p-8 text-sm max-w-4xl mx-auto w-full">
-                <h1 className="text-2xl mb-4">Quiz: Ionic Compounds</h1>
+                <h1 className="text-2xl mb-4">Quiz: Covalent Compounds</h1>
                 <form onSubmit={handleSubmit} className="Content flex flex-col w-full items-center justify-center gap-5 p-5">
                     {questions.map((question, index) => (
                         <div key={index} className="Question p-5 bg-base-200 rounded shadow-lg sm:w-3/4">

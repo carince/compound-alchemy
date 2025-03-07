@@ -341,8 +341,7 @@ export default function GamePage() {
                                         whileHover={{
                                             backgroundColor: canProceedToQuiz ? "rgba(59, 130, 246, 0.1)" : undefined
                                         }}
-                                        className={`p-3 flex justify-between items-center ${quiz_completed ? "text-green-400" : "bg-red-600/20"
-                                            }`}
+                                        className={`p-3 flex justify-between items-center disabled:bg-red-600/20 ${quiz_completed && "text-green-400"}`}
                                         onClick={() => handleNavigate("/2/quiz", canProceedToQuiz)}
                                         disabled={!canProceedToQuiz && !quiz_completed}
                                     >
@@ -358,12 +357,12 @@ export default function GamePage() {
                                             backgroundColor: canProceedToNextLevel ? "rgba(59, 130, 246, 0.1)" : undefined
                                         }}
                                         className="p-3 flex justify-between items-center disabled:bg-red-600/20"
-                                        onClick={() => handleNavigate("/3/", canProceedToNextLevel)}
+                                        onClick={() => handleNavigate("/end/", canProceedToNextLevel)}
                                         disabled={!canProceedToNextLevel}
                                     >
-                                        <span className="font-medium">Compound Alchemy!</span>
+                                        <span className="font-medium">Ending</span>
                                         <span className="text-xs opacity-80">
-                                            {canProceedToNextLevel ? "Available" : "Complete Quiz first"}
+                                            {canProceedToNextLevel ? "Thank You!" : "Complete Quiz first"}
                                         </span>
                                     </motion.button>
                                 </div>
