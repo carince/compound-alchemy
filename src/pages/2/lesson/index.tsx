@@ -328,7 +328,7 @@ export default function GamePage() {
                                         }}
                                         className={`p-3 flex justify-between items-center ${cou_completed ? "text-green-400" : ""
                                             }`}
-                                        onClick={() => handleNavigate("/1/cou", canProceedToCOU)}
+                                        onClick={() => handleNavigate("/2/cou", canProceedToCOU)}
                                         disabled={!canProceedToCOU && !cou_completed}
                                     >
                                         <span className="font-medium">Checking of Understanding</span>
@@ -343,7 +343,7 @@ export default function GamePage() {
                                         }}
                                         className={`p-3 flex justify-between items-center ${quiz_completed ? "text-green-400" : "bg-red-600/20"
                                             }`}
-                                        onClick={() => handleNavigate("/1/quiz", canProceedToQuiz)}
+                                        onClick={() => handleNavigate("/2/quiz", canProceedToQuiz)}
                                         disabled={!canProceedToQuiz && !quiz_completed}
                                     >
                                         <span className="font-medium">Quiz</span>
@@ -358,7 +358,7 @@ export default function GamePage() {
                                             backgroundColor: canProceedToNextLevel ? "rgba(59, 130, 246, 0.1)" : undefined
                                         }}
                                         className="p-3 flex justify-between items-center disabled:bg-red-600/20"
-                                        onClick={() => handleNavigate("/2/lesson", canProceedToNextLevel)}
+                                        onClick={() => handleNavigate("/3/", canProceedToNextLevel)}
                                         disabled={!canProceedToNextLevel}
                                     >
                                         <span className="font-medium">Compound Alchemy!</span>
